@@ -114,7 +114,7 @@ public class BeanRouterTest extends CamelTestSupport
 	public void setupSmooksExeceutionContext() throws Exception
 	{
 		endpoint = createAndConfigureMockEndpoint(END_POINT_URI);
-		Exchange exchange = createExchangeAndSetFromEndpoint(endpoint);
+		Exchange exchange = createExchange(endpoint);
 		BeanContext beanContext = createBeanContextAndSetBeanInContext(BEAN_ID, myBean);
 		
 		smooksExecutionContext = createStandaloneExecutionContext();
@@ -128,10 +128,9 @@ public class BeanRouterTest extends CamelTestSupport
 		return mockEndpoint;
 	}
 
-	private Exchange createExchangeAndSetFromEndpoint(MockEndpoint endpoint)
+	private Exchange createExchange(MockEndpoint endpoint)
 	{
 		Exchange exchange = endpoint.createExchange();
-		exchange.setFromEndpoint(endpoint);
 		return exchange;
 	}
 
