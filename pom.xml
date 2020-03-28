@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <camel.version>3.0.1</camel.version>
+        <camel.version>3.1.0</camel.version>
     </properties>
 
     <build>
@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>apt</artifactId>
-            <version>${camel.version}</version>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -131,7 +131,6 @@ public class BeanRouterTest extends CamelTestSupport
 	private Exchange createExchangeAndSetFromEndpoint(MockEndpoint endpoint)
 	{
 		Exchange exchange = endpoint.createExchange();
-		exchange.setFromEndpoint(endpoint);
 		return exchange;
 	}
 
