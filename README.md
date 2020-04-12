@@ -9,4 +9,4 @@
 * JDK 8 or higher
 * Maven 3
 
-## [Documentation](https://www.smooks.org/documentation/#Camel)
+## [Documentation](https://www.smooks.org/documentation/#camel)
