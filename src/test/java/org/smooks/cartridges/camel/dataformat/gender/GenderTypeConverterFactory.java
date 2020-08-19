@@ -40,71 +40,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.camel;
+package org.smooks.cartridges.camel.dataformat.gender;
 
-/**
- * 
- * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
- */
-public class Coordinate {
-	
-	private Integer x;
-	private Integer y;
-	
-	public Coordinate()  {
-	}
-	
-	public Coordinate(final int x, final int y)  {
-	    this.x = x;
-	    this.y = y;
-	}
-	
-	public Integer getX() {
-		return x;
-	}
+import org.smooks.converter.TypeConverter;
+import org.smooks.converter.factory.TypeConverterFactory;
 
-	public void setX(Integer x) {
-		this.x = x;
-	}
-
-	public Integer getY() {
-		return y;
-	}
-
-	public void setY(Integer y) {
-		this.y = y;
-	}
-
+public class GenderTypeConverterFactory implements TypeConverterFactory<String, Gender> {
     @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + x;
-        result = prime * result + y;
-        return result;
+    public TypeConverter<String, Gender> createTypeConverter() {
+        return value -> Enum.valueOf(Gender.class, value);
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Coordinate other = (Coordinate) obj;
-        if (!x.equals(other.x))
-            return false;
-        if (!y.equals(other.y))
-            return false;
-        return true;
-    }	
-    
-    public String toString()
-    {
-        return "Coordinate [x=" + x + ", y=" + y + "]";
-    }
-	
-	
 }

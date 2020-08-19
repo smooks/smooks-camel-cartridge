@@ -55,6 +55,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.payload.JavaSourceWithoutEventStream;
 
 /**

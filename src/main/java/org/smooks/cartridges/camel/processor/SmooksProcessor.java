@@ -257,9 +257,9 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware
                 if (configUri != null) {
                     smooks.addConfigurations(configUri);
                 }
+                smooks.getApplicationContext().getRegistry().registerObject(CamelContext.class, camelContext);
             }
 
-            smooks.getApplicationContext().setAttribute(CamelContext.class, camelContext);
             addAppenders(smooks, visitorAppenders);
             addVisitors(smooks, selectorVisitorMap);
 

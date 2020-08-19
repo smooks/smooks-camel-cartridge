@@ -54,6 +54,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.io.StreamUtils;
 import org.smooks.payload.JavaSource;
 
