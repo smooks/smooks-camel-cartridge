@@ -136,8 +136,8 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
         
         Coordinate coord = response.getMessage().getBody(Coordinate.class);
         
-        assertEquals(111, coord.getX());
-        assertEquals(222, coord.getY());
+        assertEquals((Integer) 111, coord.getX());
+        assertEquals((Integer) 222, coord.getY());
     }
 
 }

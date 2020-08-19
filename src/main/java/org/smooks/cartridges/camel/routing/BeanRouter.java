@@ -43,27 +43,27 @@
 package org.smooks.cartridges.camel.routing;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.apache.camel.*;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.Config;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.ExecutionLifecycleCleanable;
 import org.smooks.delivery.ExecutionLifecycleInitializable;
-import org.smooks.delivery.annotation.Initialize;
-import org.smooks.delivery.annotation.Uninitialize;
 import org.smooks.delivery.ordering.Consumer;
 import org.smooks.delivery.sax.SAXElement;
 import org.smooks.delivery.sax.SAXVisitAfter;
 import org.smooks.expression.ExecutionContextExpressionEvaluator;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.util.FreeMarkerUtils;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 
 /**
  * Camel bean routing visitor.
@@ -73,22 +73,22 @@ import org.smooks.util.FreeMarkerUtils;
  */
 public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleInitializable, ExecutionLifecycleCleanable {
     
-    @ConfigParam
+    @Inject
     private String beanId;
     
-    @ConfigParam
+    @Inject
     private String toEndpoint;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private String correlationIdName;
+    @Inject
+    private Optional<String> correlationIdName;
 
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private FreeMarkerTemplate correlationIdPattern;
+    @Inject
+    private Optional<FreeMarkerTemplate> correlationIdPattern;
     
-    @AppContext
+    @Inject
     private ApplicationContext applicationContext;
     
-    @Config
+    @Inject
     SmooksResourceConfiguration routingConfig;
 
     private ProducerTemplate producerTemplate;
@@ -102,7 +102,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
        this.camelContext = camelContext; 
     }
 
-    @Initialize
+    @PostConstruct
     public void initialize() {
         if(routingConfig == null) {
             routingConfig = new SmooksResourceConfiguration();
@@ -114,10 +114,10 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
             camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) routingConfig.getConditionEvaluator());
         }
 
-        if(correlationIdName != null && correlationIdPattern == null) {
+        if((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
             throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdName', but 'correlationIdPattern' is not configured.");
         }
-        if(correlationIdName == null && correlationIdPattern != null) {
+        if((correlationIdName == null || !correlationIdName.isPresent()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
             throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdPattern', but 'correlationIdName' is not configured.");
         }
     }
@@ -153,7 +153,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
      */
     public BeanRouter setCorrelationIdName(String correlationIdName) {
         AssertArgument.isNotNullAndNotEmpty(correlationIdName, "correlationIdName");
-        this.correlationIdName = correlationIdName;
+        this.correlationIdName = Optional.of(correlationIdName);
         return this;
     }
 
@@ -164,7 +164,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
      * @return This router instance.
      */
     public BeanRouter setCorrelationIdPattern(final String correlationIdPattern) {
-        this.correlationIdPattern = new FreeMarkerTemplate(correlationIdPattern);
+        this.correlationIdPattern = Optional.of(new FreeMarkerTemplate(correlationIdPattern));
         return this;
     }
 
@@ -182,13 +182,11 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
      */
     protected void sendBean(final Object bean, final ExecutionContext execContext) {
         try {
-            if(correlationIdPattern != null) {
-                Processor processor = new Processor() {
-                    public void process(Exchange exchange) {
-                        Message in = exchange.getIn();
-                        in.setBody(bean);
-                        in.setHeader(correlationIdName, correlationIdPattern.apply(FreeMarkerUtils.getMergedModel(execContext)));
-                    }
+            if(correlationIdPattern != null && correlationIdPattern.isPresent()) {
+                Processor processor = exchange -> {
+                    Message in = exchange.getIn();
+                    in.setBody(bean);
+                    in.setHeader(correlationIdName.orElse(null), correlationIdPattern.get().apply(FreeMarkerUtils.getMergedModel(execContext)));
                 };
                 producerTemplate.send(toEndpoint, processor);
             }else {
@@ -211,7 +209,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
 
     private CamelContext getCamelContext() {
         if (camelContext == null)
-	        return (CamelContext) applicationContext.getAttribute(CamelContext.class);
+	        return (CamelContext) applicationContext.getRegistry().lookup(CamelContext.class);
         else
             return camelContext;
     }
@@ -220,7 +218,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
         return "none".equals(routingConfig.getSelector());
     }
 
-    @Uninitialize
+    @PreDestroy
     public void uninitialize() {
         try {
             producerTemplate.stop();

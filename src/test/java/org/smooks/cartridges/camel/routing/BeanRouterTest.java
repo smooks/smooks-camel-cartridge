@@ -56,7 +56,9 @@ import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.Configurator;
+import org.smooks.cdr.injector.Scope;
+import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.standalone.StandaloneExecutionContext;
@@ -70,154 +72,136 @@ import org.smooks.javabean.lifecycle.BeanLifecycle;
  * @author Daniel Bevenius
  *
  */
-public class BeanRouterTest extends CamelTestSupport
-{
+public class BeanRouterTest extends CamelTestSupport {
 	private static final String END_POINT_URI = "mock://beanRouterUnitTest";
 	private static final String BEAN_ID = "testBeanId";
 	private static final String HEADER_ID = "testHeaderId";
-	
+
 	private StandaloneExecutionContext smooksExecutionContext;
 	private MockEndpoint endpoint;
 	private MyBean myBean = new MyBean("bajja");
 	private BeanContext beanContext;
-	
+
 	@Test
-    public void visitAfter() throws Exception
-    {
-    	endpoint.setExpectedMessageCount(1);
-    	endpoint.expectedBodiesReceived(myBean);
-    	createBeanRouter(BEAN_ID, END_POINT_URI).visitAfter(null, smooksExecutionContext);
-    	endpoint.assertIsSatisfied();
-    }
+	public void visitAfter() throws Exception {
+		endpoint.setExpectedMessageCount(1);
+		endpoint.expectedBodiesReceived(myBean);
+		createBeanRouter(BEAN_ID, END_POINT_URI).visitAfter(null, smooksExecutionContext);
+		endpoint.assertIsSatisfied();
+	}
 
-    @Test (expected = SmooksException.class)
-    public void visitAfterWithMissingBeanInSmookBeanContext() throws SmooksException, IOException
-    {
-    	when(beanContext.getBean(BEAN_ID)).thenReturn(null);
-    	createBeanRouter(BEAN_ID, END_POINT_URI).visitAfter(null, smooksExecutionContext);
-    }
+	@Test(expected = SmooksException.class)
+	public void visitAfterWithMissingBeanInSmookBeanContext() throws SmooksException, IOException {
+		when(beanContext.getBean(BEAN_ID)).thenReturn(null);
+		createBeanRouter(BEAN_ID, END_POINT_URI).visitAfter(null, smooksExecutionContext);
+	}
 
-    @Test
-    public void routeUsingOnlyBeanId() throws Exception
-    {
-    	endpoint.setExpectedMessageCount(1);
-    	endpoint.expectedBodiesReceived(myBean);
+	@Test
+	public void routeUsingOnlyBeanId() throws Exception {
+		endpoint.setExpectedMessageCount(1);
+		endpoint.expectedBodiesReceived(myBean);
 
-    	final Smooks smooks = new Smooks();
-        final ExecutionContext execContext = smooks.createExecutionContext();
-        
-    	BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
-    	beanRouter.executeExecutionLifecycleInitialize(execContext);
-        execContext.getBeanContext().addBean(BEAN_ID, myBean);
+		final Smooks smooks = new Smooks();
+		final ExecutionContext execContext = smooks.createExecutionContext();
 
-        // Force an END event
-        execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
-                null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
+		BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
+		beanRouter.executeExecutionLifecycleInitialize(execContext);
+		execContext.getBeanContext().addBean(BEAN_ID, myBean);
 
-    	endpoint.assertIsSatisfied();
-    }
+		// Force an END event
+		execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
+				null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
 
-    @Test
-    public void routeBeanWithHeaders() throws Exception
-    {
-    	endpoint.setExpectedMessageCount(1);
-    	endpoint.expectedHeaderReceived(HEADER_ID, myBean);
+		endpoint.assertIsSatisfied();
+	}
 
-    	final Smooks smooks = new Smooks();
-        final ExecutionContext execContext = smooks.createExecutionContext();
-        
-    	BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
-    	beanRouter.executeExecutionLifecycleInitialize(execContext);
-        execContext.getBeanContext().addBean(BEAN_ID, myBean);
-        execContext.getBeanContext().addBean(HEADER_ID, myBean);
+	@Test
+	public void routeBeanWithHeaders() throws Exception {
+		endpoint.setExpectedMessageCount(1);
+		endpoint.expectedHeaderReceived(HEADER_ID, myBean);
 
-        // Force an END event
-        execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
-                null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
+		final Smooks smooks = new Smooks();
+		final ExecutionContext execContext = smooks.createExecutionContext();
 
-    	endpoint.assertIsSatisfied();
-    }
-    
-    @Before
-	public void setupSmooksExeceutionContext() throws Exception
-	{
+		BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
+		beanRouter.executeExecutionLifecycleInitialize(execContext);
+		execContext.getBeanContext().addBean(BEAN_ID, myBean);
+		execContext.getBeanContext().addBean(HEADER_ID, myBean);
+
+		// Force an END event
+		execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
+				null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
+
+		endpoint.assertIsSatisfied();
+	}
+
+	@Before
+	public void setupSmooksExeceutionContext() throws Exception {
 		endpoint = createAndConfigureMockEndpoint(END_POINT_URI);
 		Exchange exchange = createExchange(endpoint);
 		BeanContext beanContext = createBeanContextAndSetBeanInContext(BEAN_ID, myBean);
-		
+
 		smooksExecutionContext = createStandaloneExecutionContext();
 		setExchangeAsAttributeInExecutionContext(exchange);
 		makeExecutionContextReturnBeanContext(beanContext);
 	}
-	
-	private MockEndpoint createAndConfigureMockEndpoint(String endpointUri) throws Exception
-	{
+
+	private MockEndpoint createAndConfigureMockEndpoint(String endpointUri) throws Exception {
 		MockEndpoint mockEndpoint = getMockEndpoint(endpointUri);
 		return mockEndpoint;
 	}
 
-	private Exchange createExchange(MockEndpoint endpoint)
-	{
+	private Exchange createExchange(MockEndpoint endpoint) {
 		Exchange exchange = endpoint.createExchange();
 		return exchange;
 	}
 
-	private BeanContext createBeanContextAndSetBeanInContext(String beanId, Object bean)
-	{
+	private BeanContext createBeanContextAndSetBeanInContext(String beanId, Object bean) {
 		beanContext = mock(BeanContext.class);
 		when(beanContext.getBean(beanId)).thenReturn(bean);
 		return beanContext;
 	}
 
-	private StandaloneExecutionContext createStandaloneExecutionContext()
-	{
+	private StandaloneExecutionContext createStandaloneExecutionContext() {
 		return mock(StandaloneExecutionContext.class);
 	}
 
-	private void setExchangeAsAttributeInExecutionContext(Exchange exchange)
-	{
+	private void setExchangeAsAttributeInExecutionContext(Exchange exchange) {
 		when(smooksExecutionContext.getAttribute(Exchange.class)).thenReturn(exchange);
 	}
-	
-	private void makeExecutionContextReturnBeanContext(BeanContext beanContext)
-	{
+
+	private void makeExecutionContextReturnBeanContext(BeanContext beanContext) {
 		when(smooksExecutionContext.getBeanContext()).thenReturn(beanContext);
 	}
-	
-	private BeanRouter createBeanRouter(String beanId, String endpointUri)
-	{
-	    return createBeanRouter("dummySelector", beanId, endpointUri);
+
+	private BeanRouter createBeanRouter(String beanId, String endpointUri) {
+		return createBeanRouter("dummySelector", beanId, endpointUri);
 	}
-	
-	private BeanRouter createBeanRouter(String selector, String beanId, String endpointUri)
-	{
+
+	private BeanRouter createBeanRouter(String selector, String beanId, String endpointUri) {
 		BeanRouter beanRouter = new BeanRouter();
 		SmooksResourceConfiguration resourceConfig = new SmooksResourceConfiguration();
-		if (selector != null)
-		{
+		if (selector != null) {
 			resourceConfig.setSelector(selector);
 		}
 		resourceConfig.setParameter("beanId", beanId);
 		resourceConfig.setParameter("toEndpoint", endpointUri);
-		
+
 		MockApplicationContext appContext = new MockApplicationContext();
-		appContext.setAttribute(CamelContext.class, context);
-		Configurator.configure(beanRouter, resourceConfig, appContext);
-		
+		appContext.getRegistry().registerObject(CamelContext.class, context);
+		appContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(beanRouter, new PostConstructLifecyclePhase(new Scope(appContext.getRegistry(), resourceConfig, beanId)));
+
 		return beanRouter;
 	}
-	
-	public static class MyBean
-	{
+
+	public static class MyBean {
 		private final String name;
 
-		public MyBean(String name)
-		{
+		public MyBean(String name) {
 			this.name = name;
 		}
-		
-		public String getName()
-		{
+
+		public String getName() {
 			return name;
 		}
 	}
