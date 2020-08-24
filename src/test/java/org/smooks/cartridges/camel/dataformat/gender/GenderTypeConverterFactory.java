@@ -43,11 +43,17 @@
 package org.smooks.cartridges.camel.dataformat.gender;
 
 import org.smooks.converter.TypeConverter;
+import org.smooks.converter.TypeConverterDescriptor;
 import org.smooks.converter.factory.TypeConverterFactory;
 
 public class GenderTypeConverterFactory implements TypeConverterFactory<String, Gender> {
     @Override
     public TypeConverter<String, Gender> createTypeConverter() {
         return value -> Enum.valueOf(Gender.class, value);
+    }
+
+    @Override
+    public TypeConverterDescriptor<Class<String>, Class<Gender>> getTypeConverterDescriptor() {
+        return new TypeConverterDescriptor<>(String.class, Gender.class);
     }
 }
