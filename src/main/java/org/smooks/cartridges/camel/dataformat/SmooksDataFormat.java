@@ -49,8 +49,9 @@ import org.apache.camel.support.processor.UnmarshalProcessor;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.SmooksFactory;
-import org.smooks.cartridges.camel.processor.SmooksProcessor;
 import org.smooks.cartridges.camel.component.SmooksComponent;
+import org.smooks.cartridges.camel.processor.SmooksProcessor;
+import org.smooks.cdr.registry.lookup.ExportsLookup;
 import org.smooks.container.ExecutionContext;
 import org.smooks.payload.Exports;
 import org.smooks.payload.JavaSource;
@@ -122,9 +123,9 @@ public class SmooksDataFormat implements DataFormat, CamelContextAware, Service 
      * @param exchange   The Camel {@link Exchange}.
      * @param fromStream The InputStream that will be unmarshalled into an Object instance.
      */
-    public Object unmarshal(final Exchange exchange, final InputStream fromStream) throws Exception {
+    public Object unmarshal(final Exchange exchange, final InputStream fromStream) {
         final ExecutionContext execContext = smooks.createExecutionContext();
-        final Exports exports = Exports.getExports(smooks.getApplicationContext());
+        final Exports exports = smooks.getApplicationContext().getRegistry().lookup(new ExportsLookup());
         final Result[] results = exports.createResults();
         smooks.filterSource(execContext, new StreamSource(fromStream), results);
         return getResult(exports, results, exchange);
