@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.camel.routing;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Message;
+import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.SmooksConfigurationException;
@@ -64,6 +64,8 @@ import org.smooks.util.FreeMarkerUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Camel bean routing visitor.
@@ -111,7 +113,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
         producerTemplate = getCamelContext().createProducerTemplate();
         if (isBeanRoutingConfigured()) {
             camelRouterObserable = new BeanRouterObserver(this, beanId);
-            camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) routingConfig.getConditionEvaluator());
+            camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) routingConfig.getSelectorPath().getConditionEvaluator());
         }
 
         if((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
@@ -215,7 +217,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
     }
     
     private boolean isBeanRoutingConfigured() {
-        return "none".equals(routingConfig.getSelector());
+        return "none".equals(routingConfig.getSelectorPath().getSelector());
     }
 
     @PreDestroy
