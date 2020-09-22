@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema elementFormDefault="qualified"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://www.smooks.org/xsd/smooks/camel-1.5.xsd"
-	xmlns:smooks-camel="https://www.smooks.org/xsd/smooks/camel-1.5.xsd"
-	xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd">
+	xmlns:camel="https://www.smooks.org/xsd/smooks/camel-1.5.xsd"
+	xmlns:smooks="https://www.smooks.org/xsd/smooks-2.0.xsd">
 
-	<xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd" />
+	<xs:import namespace="https://www.smooks.org/xsd/smooks-2.0.xsd" />
 
 	<xs:annotation>
 		<xs:documentation xml:lang="en">Smooks Camel Integration
 			Configuration</xs:documentation>
 	</xs:annotation>
 
-	<xs:element name="route" substitutionGroup="smooks:abstract-resource-config" type="smooks-camel:route" />
+	<xs:element name="route" substitutionGroup="smooks:abstract-resource-config" type="camel:route" />
 	<xs:complexType name="route">
         <xs:complexContent>
             <xs:extension base="smooks:abstract-resource-config">
 		        <xs:sequence>
-		            <xs:element name="to" type="smooks-camel:to" minOccurs="1" maxOccurs="unbounded" />
+		            <xs:element name="to" type="camel:to" minOccurs="1" maxOccurs="unbounded" />
 		        </xs:sequence>
 				<xs:attribute name="beanId" type="xs:string" use="required">
 					<xs:annotation>

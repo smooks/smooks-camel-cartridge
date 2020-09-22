@@ -211,7 +211,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
 
     private CamelContext getCamelContext() {
         if (camelContext == null)
-	        return (CamelContext) applicationContext.getRegistry().lookup(CamelContext.class);
+	        return applicationContext.getRegistry().lookup(CamelContext.class);
         else
             return camelContext;
     }
