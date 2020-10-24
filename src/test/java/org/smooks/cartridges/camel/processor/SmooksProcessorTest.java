@@ -52,8 +52,10 @@ import org.apache.camel.spi.ManagementAgent;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.*;
-import org.smooks.delivery.Filter;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.smooks.io.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -82,16 +84,8 @@ public class SmooksProcessorTest extends CamelTestSupport
     private MBeanServer mbeanServer;
 
     @BeforeClass
-    public static void setup()
-    {
+    public static void setup() {
         XMLUnit.setIgnoreWhitespace(true);
-        System.setProperty(Filter.STREAM_FILTER_TYPE, "DOM");
-    }
-
-    @AfterClass
-    public static void resetFilter()
-    {
-        System.getProperties().remove(Filter.STREAM_FILTER_TYPE);
     }
 
     @Before

@@ -52,19 +52,18 @@ import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.ExecutionLifecycleCleanable;
-import org.smooks.delivery.ExecutionLifecycleInitializable;
 import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.SAXElement;
-import org.smooks.delivery.sax.SAXVisitAfter;
+import org.smooks.delivery.sax.ng.AfterVisitor;
 import org.smooks.expression.ExecutionContextExpressionEvaluator;
+import org.smooks.lifecycle.ExecutionLifecycleCleanable;
+import org.smooks.lifecycle.ExecutionLifecycleInitializable;
 import org.smooks.util.FreeMarkerTemplate;
 import org.smooks.util.FreeMarkerUtils;
+import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -73,7 +72,7 @@ import java.util.Optional;
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  * @author <a href="mailto:daniel.bevenius@gmail.com">daniel.bevenius@gmail.com</a>
  */
-public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleInitializable, ExecutionLifecycleCleanable {
+public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleInitializable, ExecutionLifecycleCleanable {
     
     @Inject
     private String beanId;
@@ -105,8 +104,8 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
     }
 
     @PostConstruct
-    public void initialize() {
-        if(routingConfig == null) {
+    public void postConstruct() {
+        if (routingConfig == null) {
             routingConfig = new SmooksResourceConfiguration();
         }
 
@@ -116,10 +115,10 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
             camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) routingConfig.getSelectorPath().getConditionEvaluator());
         }
 
-        if((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
+        if ((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
             throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdName', but 'correlationIdPattern' is not configured.");
         }
-        if((correlationIdName == null || !correlationIdName.isPresent()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
+        if ((correlationIdName == null || !correlationIdName.isPresent()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
             throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdPattern', but 'correlationIdName' is not configured.");
         }
     }
@@ -170,11 +169,10 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
         return this;
     }
 
-    public void visitAfter(final SAXElement element, final ExecutionContext execContext) throws SmooksException, IOException
-    {
-        final Object bean = getBeanFromExecutionContext(execContext, beanId);
-
-        sendBean(bean, execContext);
+    @Override
+    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
+        final Object bean = getBeanFromExecutionContext(executionContext, beanId);
+        sendBean(bean, executionContext);
     }
 
     /**
@@ -221,7 +219,7 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
     }
 
     @PreDestroy
-    public void uninitialize() {
+    public void preDestroy() {
         try {
             producerTemplate.stop();
         }  catch (final Exception e) {
@@ -229,16 +227,19 @@ public class BeanRouter implements SAXVisitAfter, Consumer, ExecutionLifecycleIn
         }
     }
 
+    @Override
     public boolean consumes(final Object object) {
         return beanId.equals(object);
     }
 
+    @Override
     public void executeExecutionLifecycleInitialize(final ExecutionContext executionContext) {
         if (isBeanRoutingConfigured()) {
             executionContext.getBeanContext().addObserver(camelRouterObserable);
         }
     }
-    
+
+    @Override
     public void executeExecutionLifecycleCleanup(ExecutionContext executionContext) {
         if (isBeanRoutingConfigured()) {
             executionContext.getBeanContext().removeObserver(camelRouterObserable);

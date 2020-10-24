@@ -47,17 +47,16 @@ import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
 import org.junit.Test;
-import org.smooks.cartridges.javabean.Bean;
-import org.smooks.payload.StringSource;
 import org.smooks.cartridges.camel.Coordinate;
 import org.smooks.cartridges.camel.routing.BeanRouter;
+import org.smooks.cartridges.javabean.Bean;
+import org.smooks.payload.StringSource;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * Functional test for {@link SmooksProcessor} which test bean routing configured
@@ -107,7 +106,7 @@ public class SmooksProcessor_BeanRouting_Test extends CamelTestSupport {
         final String fromEndpoint = "direct:a2";
         context.addRoutes(new RouteBuilder() {
             @Override
-            public void configure() throws Exception {
+            public void configure() {
                 from(fromEndpoint).to("smooks://bean_routing_01.xml");
             }
         });

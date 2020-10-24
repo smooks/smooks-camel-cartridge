@@ -60,39 +60,33 @@ import java.io.InputStream;
  * @author Daniel Bevenius
  */
 @Converter(generateLoader = true)
-public class SourceConverter
-{
-    private SourceConverter()
-    {
+public class SourceConverter {
+    private SourceConverter() {
     }
 
     @Converter
-    public static JavaSourceWithoutEventStream toJavaSourceWithoutEventStream(Object payload)
-    {
+    public static JavaSourceWithoutEventStream toJavaSourceWithoutEventStream(Object payload) {
         return new JavaSourceWithoutEventStream(payload);
     }
 
     @Converter
-    public static JavaSource toJavaSource(Object payload)
-    {
+    public static JavaSource toJavaSource(Object payload) {
         return new JavaSource(payload);
     }
 
     @Converter
-    public static Source toStreamSource(InputStream in)
-    {
+    public static Source toStreamSource(InputStream in) {
         return new StreamSource(in);
     }
 
     @Converter
-    public static JavaSource toJavaSource(JavaResult result)
-    {
+    public static JavaSource toJavaSource(JavaResult result) {
         return new JavaSource(result.getResultMap().values());
     }
-    
+
     @Converter
-    public static Source toStreamSource(GenericFile<File> genericFile){
-    	return new StreamSource((File)genericFile.getBody());
+    public static Source toStreamSource(GenericFile<File> genericFile) {
+        return new StreamSource((File) genericFile.getBody());
     }
 
 }
