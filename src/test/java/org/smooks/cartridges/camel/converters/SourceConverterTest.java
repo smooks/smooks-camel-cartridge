@@ -42,16 +42,16 @@
  */
 package org.smooks.cartridges.camel.converters;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.Map;
-
 import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.payload.JavaSourceWithoutEventStream;
+
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Unit test for {@link SourceConverter}. </p>
@@ -59,20 +59,17 @@ import org.smooks.payload.JavaSourceWithoutEventStream;
  * @author Daniel Bevenius
  * 
  */
-public class SourceConverterTest
-{
+public class SourceConverterTest {
     private TypeConverter typeConverter;
 
     @Before
-    public void getTypeConverter()
-    {
+    public void getTypeConverter() {
         DefaultCamelContext camelContext = new DefaultCamelContext();
         typeConverter = camelContext.getTypeConverter();
     }
 
     @Test
-    public void convertStringToJavaSourceWithoutEventStream()
-    {
+    public void convertStringToJavaSourceWithoutEventStream() {
         final String payload = "dummyPayload";
         final JavaSourceWithoutEventStream javaSource = typeConverter.convertTo(JavaSourceWithoutEventStream.class, payload);
         final Map<String, Object> beans = javaSource.getBeans();
@@ -80,5 +77,4 @@ public class SourceConverterTest
 
         assertThat(payload, is(actualPayload));
     }
-    
 }

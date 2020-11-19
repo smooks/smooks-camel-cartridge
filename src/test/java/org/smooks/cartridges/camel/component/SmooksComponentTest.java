@@ -42,23 +42,21 @@
  */
 package org.smooks.cartridges.camel.component;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-
-import java.io.InputStreamReader;
-import java.io.StringReader;
-
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.smooks.delivery.Filter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import java.io.InputStreamReader;
+import java.io.StringReader;
+
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 /**
  * Unit test for {@link SmooksComponent}.
@@ -69,25 +67,16 @@ import org.w3c.dom.Node;
  */
 public class SmooksComponentTest extends CamelTestSupport
 {
-    @EndpointInject(uri = "mock:result")
+    @EndpointInject(value = "mock:result")
     private MockEndpoint result;
 
     @BeforeClass
-    public static void setup()
-    {
+    public static void setup() {
         XMLUnit.setIgnoreWhitespace(true);
-        System.setProperty(Filter.STREAM_FILTER_TYPE, "DOM");
-    }
-
-    @AfterClass
-    public static void resetFilter()
-    {
-        System.getProperties().remove(Filter.STREAM_FILTER_TYPE);
     }
 
     @Test
-    public void unmarshalEDI() throws Exception
-    {
+    public void unmarshalEDI() throws Exception {
         result.expectedMessageCount(1);
         assertMockEndpointsSatisfied();
 
@@ -97,25 +86,21 @@ public class SmooksComponentTest extends CamelTestSupport
         assertXMLEqual(getExpectedOrderXml(), getBodyAsString(exchange));
     }
 
-    private InputStreamReader getExpectedOrderXml()
-    {
+    private InputStreamReader getExpectedOrderXml() {
         return new InputStreamReader(getClass().getResourceAsStream("/xml/expected-order.xml"));
     }
 
-    private StringReader getBodyAsString(Exchange exchange)
-    {
+    private StringReader getBodyAsString(Exchange exchange) {
         return new StringReader(exchange.getIn().getBody(String.class));
     }
 
-    protected RouteBuilder createRouteBuilder() throws Exception
-    {
-        return new RouteBuilder()
-        {
-            public void configure() throws Exception
-            {
+    @Override
+    protected RouteBuilder createRouteBuilder() {
+        return new RouteBuilder() {
+            public void configure() throws Exception {
                 from("file://src/test/resources/data?noop=true")
-                .to("smooks://edi-to-xml-smooks-config.xml")
-                .convertBodyTo(Node.class).to("mock:result");
+                        .to("smooks://edi-to-xml-smooks-config.xml")
+                        .convertBodyTo(Node.class).to("mock:result");
             }
         };
     }
