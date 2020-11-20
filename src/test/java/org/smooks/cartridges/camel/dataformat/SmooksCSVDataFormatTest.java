@@ -43,9 +43,6 @@
 package org.smooks.cartridges.camel.dataformat;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.camel.Endpoint;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -58,6 +55,9 @@ import org.junit.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.payload.JavaSourceWithoutEventStream;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Smooks CSV DataFormat unit test.
  */
@@ -66,13 +66,13 @@ public class SmooksCSVDataFormatTest extends CamelTestSupport {
     private static Customer charlesExpected;
     private static Customer chrisExpected;
 
-    @EndpointInject(uri = "direct:unmarshal")
+    @EndpointInject(value = "direct:unmarshal")
     private Endpoint unmarshal;
 
-    @EndpointInject(uri = "direct:marshal")
+    @EndpointInject(value = "direct:marshal")
     private Endpoint marshal;
     
-    @EndpointInject(uri = "mock:result")
+    @EndpointInject(value = "mock:result")
     private MockEndpoint result;
 
     @Test

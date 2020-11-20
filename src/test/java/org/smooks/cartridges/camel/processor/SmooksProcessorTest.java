@@ -77,9 +77,8 @@ import static org.hamcrest.CoreMatchers.*;
  * @author Christian Mueller
  * @author Daniel Bevenius
  */
-public class SmooksProcessorTest extends CamelTestSupport
-{
-    @EndpointInject(uri = "mock:result")
+public class SmooksProcessorTest extends CamelTestSupport {
+    @EndpointInject(value = "mock:result")
     private MockEndpoint result;
     private MBeanServer mbeanServer;
 
@@ -89,71 +88,63 @@ public class SmooksProcessorTest extends CamelTestSupport
     }
 
     @Before
-    public void getMbeanServer()
-    {
+    public void getMbeanServer() {
         ManagementAgent managementAgent = context.getManagementStrategy().getManagementAgent();
         mbeanServer = managementAgent.getMBeanServer();
     }
 
     @Override
-    protected boolean useJmx()
-    {
+    protected boolean useJmx() {
         return true;
     }
 
     @Test
-    public void process() throws Exception
-    {
+    public void process() throws Exception {
         assertOneProcessedMessage();
     }
-    
-    private void assertOneProcessedMessage() throws Exception
-    {
+
+    private void assertOneProcessedMessage() throws Exception {
         result.expectedMessageCount(1);
         template.sendBody("direct://input", getOrderEdi());
-    
+
         assertMockEndpointsSatisfied();
-    
+
         Exchange exchange = result.assertExchangeReceived(0);
         assertIsInstanceOf(Document.class, exchange.getIn().getBody());
         assertXMLEqual(getExpectedOrderXml(), exchange.getIn().getBody(String.class));
     }
 
     @Test
-    public void processWithAttachment() throws CamelExecutionException, IOException 
-    {
+    public void processWithAttachment() throws CamelExecutionException, IOException {
         final DefaultExchange exchange = new DefaultExchange(context);
         final String attachmentContent = "A dummy attachment";
         final String attachmentId = "testAttachment";
         addAttachment(attachmentContent, attachmentId, exchange);
         exchange.getIn().setBody(getOrderEdi());
-        
+
         template.send("direct://input", exchange);
-        
+
         final DataHandler datahandler = result.assertExchangeReceived(0).getIn(AttachmentMessage.class).getAttachment(attachmentId);
         assertThat(datahandler, is(notNullValue()));
         assertThat(datahandler.getContent(), is(instanceOf(ByteArrayInputStream.class)));
-        
+
         final String actualAttachmentContent = getAttachmentContent(datahandler);
         assertThat(actualAttachmentContent, is(equalTo(attachmentContent)));
     }
-    
-    private void addAttachment(final String attachment, final String id, final Exchange exchange) 
-    {
+
+    private void addAttachment(final String attachment, final String id, final Exchange exchange) {
         final DataSource ds = new StringDataSource(attachment);
         final DataHandler dataHandler = new DataHandler(ds);
         exchange.getIn(AttachmentMessage.class).addAttachment(id, dataHandler);
     }
-    
-    private String getAttachmentContent(final DataHandler datahandler) throws IOException 
-    {
+
+    private String getAttachmentContent(final DataHandler datahandler) throws IOException {
         final ByteArrayInputStream bs = (ByteArrayInputStream) datahandler.getContent();
         return new String(StreamUtils.readStream(bs));
     }
 
     @Test
-    public void assertSmooksReportWasCreated() throws Exception
-    {
+    public void assertSmooksReportWasCreated() throws Exception {
         assertOneProcessedMessage();
 
         File report = new File("target/smooks-report.html");
@@ -163,8 +154,7 @@ public class SmooksProcessorTest extends CamelTestSupport
 
     @Test
     @Ignore
-    public void stopStartContext() throws Exception
-    {
+    public void stopStartContext() throws Exception {
         ObjectInstance smooksProcessorMBean = getSmooksProcessorObjectInstance();
 
         assertOneProcessedMessage();
@@ -177,42 +167,33 @@ public class SmooksProcessorTest extends CamelTestSupport
         assertOneProcessedMessage();
     }
 
-    private void stopSmooksProcessor(ObjectName objectName) throws Exception
-    {
+    private void stopSmooksProcessor(ObjectName objectName) throws Exception {
         invokeVoidNoArgsMethod(objectName, "stop");
     }
 
-    private void invokeVoidNoArgsMethod(ObjectName objectName, String methodName) throws Exception
-    {
+    private void invokeVoidNoArgsMethod(ObjectName objectName, String methodName) throws Exception {
         mbeanServer.invoke(objectName, methodName, null, null);
     }
 
-    private void startSmooksProcessor(ObjectName objectName) throws Exception
-    {
+    private void startSmooksProcessor(ObjectName objectName) throws Exception {
         invokeVoidNoArgsMethod(objectName, "start");
     }
 
-    private ObjectInstance getSmooksProcessorObjectInstance() throws Exception
-    {
+    private ObjectInstance getSmooksProcessorObjectInstance() throws Exception {
         ObjectInstance mbean = null;
         Set<ObjectInstance> queryMBeans = mbeanServer.queryMBeans(new ObjectName("*:*,type=processors"), null);
-        for (ObjectInstance objectInstance : queryMBeans)
-        {
-            if (objectInstance.getObjectName().toString().contains(SmooksProcessor.class.getSimpleName()))
-            {
-	            mbean = objectInstance;
+        for (ObjectInstance objectInstance : queryMBeans) {
+            if (objectInstance.getObjectName().toString().contains(SmooksProcessor.class.getSimpleName())) {
+                mbean = objectInstance;
             }
         }
         assertNotNull(mbean);
         return mbean;
     }
 
-    protected RouteBuilder createRouteBuilder() throws Exception
-    {
-        return new RouteBuilder()
-        {
-            public void configure() throws Exception
-            {
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            public void configure() throws Exception {
                 SmooksProcessor processor = new SmooksProcessor("edi-to-xml-smooks-config.xml", context);
                 processor.setReportPath("target/smooks-report.html");
 
@@ -221,45 +202,37 @@ public class SmooksProcessorTest extends CamelTestSupport
         };
     }
 
-    private String getExpectedOrderXml() throws IOException
-    {
+    private String getExpectedOrderXml() throws IOException {
         return StreamUtils.readStream(new InputStreamReader(getClass().getResourceAsStream("/xml/expected-order.xml")));
     }
-    
-    private String getOrderEdi() throws IOException
-    {
+
+    private String getOrderEdi() throws IOException {
         return StreamUtils.readStream(new InputStreamReader(getClass().getResourceAsStream("/data/order.edi")));
     }
-    
-    private class StringDataSource implements DataSource
-    {
+
+    private class StringDataSource implements DataSource {
         private final String string;
 
-        private StringDataSource(final String string) 
-        {
+        private StringDataSource(final String string) {
             this.string = string;
-            
+
         }
-        
-        public String getContentType()
-        {
+
+        public String getContentType() {
             return "text/plain";
         }
 
-        public InputStream getInputStream() throws IOException
-        {
+        public InputStream getInputStream() throws IOException {
             return new ByteArrayInputStream(string.getBytes());
         }
 
-        public String getName()
-        {
+        public String getName() {
             return "StringDataSource";
         }
 
-        public OutputStream getOutputStream() throws IOException
-        {
+        public OutputStream getOutputStream() throws IOException {
             throw new IOException("Method 'getOutputStream' is not implmeneted");
         }
-        
+
     }
 }
