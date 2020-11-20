@@ -51,11 +51,11 @@ import org.smooks.SmooksException;
 import org.smooks.SmooksFactory;
 import org.smooks.cartridges.camel.component.SmooksComponent;
 import org.smooks.cartridges.camel.processor.SmooksProcessor;
-import org.smooks.cdr.registry.lookup.ExportsLookup;
 import org.smooks.container.ExecutionContext;
 import org.smooks.payload.Exports;
 import org.smooks.payload.JavaSource;
 import org.smooks.payload.StringResult;
+import org.smooks.registry.lookup.ExportsLookup;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.Result;

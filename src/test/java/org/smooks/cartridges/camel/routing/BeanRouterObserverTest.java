@@ -42,9 +42,6 @@
  */
 package org.smooks.cartridges.camel.routing;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;
@@ -53,6 +50,9 @@ import org.smooks.container.MockExecutionContext;
 import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
 import org.smooks.javabean.lifecycle.BeanLifecycle;
 import org.smooks.javabean.repository.BeanId;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link BeanRouterObserver}
@@ -80,7 +80,7 @@ public class BeanRouterObserverTest extends CamelTestSupport
 
         beanRouter.setBeanId(beanId);
         beanRouter.setToEndpoint(ENDPOINT_URI);
-        beanRouter.initialize();
+        beanRouter.postConstruct();
 
         final BeanRouterObserver beanRouterObserver = new BeanRouterObserver(beanRouter, beanId);
         final MockExecutionContext smooksExecutionContext = new MockExecutionContext();

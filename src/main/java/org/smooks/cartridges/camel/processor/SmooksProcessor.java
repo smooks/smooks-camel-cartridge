@@ -50,12 +50,12 @@ import org.slf4j.LoggerFactory;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.SmooksFactory;
-import org.smooks.cdr.registry.lookup.ExportsLookup;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.Visitor;
 import org.smooks.delivery.VisitorAppender;
 import org.smooks.event.report.HtmlReportGenerator;
 import org.smooks.payload.Exports;
+import org.smooks.registry.lookup.ExportsLookup;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -96,7 +96,6 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
 
     public SmooksProcessor(final Smooks smooks, final CamelContext camelContext) {
         this(camelContext);
-        ;
         this.smooks = smooks;
     }
 

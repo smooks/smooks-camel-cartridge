@@ -91,10 +91,8 @@ public class BeanRouterObserver implements BeanContextLifecycleObserver
      * Will route to the endpoint if the BeanLifecycle is of type BeanLifecycle.REMOVE and
      * the beanId is equals to the beanId that was configured for this instance.
      */
-    public void onBeanLifecycleEvent(final BeanContextLifecycleEvent event)
-    {
-        if (endEventAndBeanIdMatch(event) && conditionsMatch(event))
-        {
+    public void onBeanLifecycleEvent(final BeanContextLifecycleEvent event) {
+        if (endEventAndBeanIdMatch(event) && conditionsMatch(event)) {
             beanRouter.sendBean(event.getBean(), event.getExecutionContext());
         }
     }
