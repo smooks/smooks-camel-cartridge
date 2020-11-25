@@ -48,8 +48,8 @@ import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.smooks.SmooksException;
 import org.smooks.assertion.AssertArgument;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.ordering.Consumer;
@@ -90,7 +90,7 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     private ApplicationContext applicationContext;
     
     @Inject
-    SmooksResourceConfiguration routingConfig;
+    ResourceConfig resourceConfig;
 
     private ProducerTemplate producerTemplate;
     private BeanRouterObserver camelRouterObserable;
@@ -105,14 +105,14 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
 
     @PostConstruct
     public void postConstruct() {
-        if (routingConfig == null) {
-            routingConfig = new SmooksResourceConfiguration();
+        if (resourceConfig == null) {
+            resourceConfig = new ResourceConfig();
         }
 
         producerTemplate = getCamelContext().createProducerTemplate();
         if (isBeanRoutingConfigured()) {
             camelRouterObserable = new BeanRouterObserver(this, beanId);
-            camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) routingConfig.getSelectorPath().getConditionEvaluator());
+            camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) resourceConfig.getSelectorPath().getConditionEvaluator());
         }
 
         if ((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
@@ -215,7 +215,7 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     }
     
     private boolean isBeanRoutingConfigured() {
-        return "none".equals(routingConfig.getSelectorPath().getSelector());
+        return "none".equals(resourceConfig.getSelectorPath().getSelector());
     }
 
     @PreDestroy

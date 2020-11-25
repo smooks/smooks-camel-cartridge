@@ -50,7 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.container.standalone.StandaloneExecutionContext;
@@ -180,7 +180,7 @@ public class BeanRouterTest extends CamelTestSupport {
 
 	private BeanRouter createBeanRouter(String selector, String beanId, String endpointUri) {
 		BeanRouter beanRouter = new BeanRouter();
-		SmooksResourceConfiguration resourceConfig = new SmooksResourceConfiguration();
+		ResourceConfig resourceConfig = new ResourceConfig();
 		if (selector != null) {
 			resourceConfig.setSelector(selector);
 		}
