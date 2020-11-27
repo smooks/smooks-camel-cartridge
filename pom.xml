@@ -7,7 +7,7 @@
 
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-camel-cartridge</artifactId>
-    <version>2.0.0-M2-SNAPSHOT</version>
+    <version>2.0.0-M2</version>
     <packaging>bundle</packaging>
 
     <name>Smooks Camel Cartridge</name>
@@ -215,24 +215,24 @@
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-javabean-cartridge</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
         </dependency>
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-csv-cartridge</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.smooks.cartridges</groupId>
             <artifactId>smooks-templating-cartridge</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.smooks.cartridges.edi</groupId>
             <artifactId>smooks-edi-cartridge</artifactId>
-            <version>2.0.0-M2-SNAPSHOT</version>
+            <version>2.0.0-M2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -274,7 +274,7 @@
     <repositories>
         <repository>
             <id>oss.sonatype.org-snapshot</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -287,7 +287,7 @@
     <distributionManagement>
         <repository>
             <id>ossrh</id>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>ossrh</id>
