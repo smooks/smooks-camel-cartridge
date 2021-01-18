@@ -51,6 +51,7 @@ import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.SmooksFactory;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.TypedKey;
 import org.smooks.delivery.Visitor;
 import org.smooks.delivery.VisitorAppender;
 import org.smooks.event.report.HtmlReportGenerator;
@@ -80,6 +81,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
     public static final String SMOOKS_EXECUTION_CONTEXT = "CamelSmooksExecutionContext";
     public static final String CAMEL_CHARACTER_ENCODING = "CamelCharsetName";
     private static final Logger LOGGER = LoggerFactory.getLogger(SmooksProcessor.class);
+    public static final TypedKey<Exchange> EXCHANGE_TYPED_KEY = new TypedKey<>();
 
     private Smooks smooks;
     private String configUri;
@@ -118,7 +120,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
         }
 
         final ExecutionContext executionContext = smooks.createExecutionContext();
-        executionContext.setAttribute(Exchange.class, exchange);
+        executionContext.put(EXCHANGE_TYPED_KEY, exchange);
         String charsetName = (String) exchange.getProperty(CAMEL_CHARACTER_ENCODING);
         if (charsetName != null) //if provided use the came character encoding
         {
@@ -136,7 +138,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
             smooks.filterSource(executionContext, getSource(exchange));
         }
 
-        executionContext.removeAttribute(Exchange.class);
+        executionContext.remove(EXCHANGE_TYPED_KEY);
     }
 
     protected void setResultOnBody(final Exports exports, final Result[] results, final Exchange exchange) {
@@ -153,7 +155,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
     private void setupSmooksReporting(final ExecutionContext executionContext) {
         if (reportPath != null) {
             try {
-                executionContext.setEventListener(new HtmlReportGenerator(reportPath));
+                executionContext.getContentDeliveryRuntime().addExecutionEventListener(new HtmlReportGenerator(reportPath));
             } catch (final IOException e) {
                 LOGGER.info("Could not generate Smooks Report. The reportPath specified was [" + reportPath + "].", e);
             }

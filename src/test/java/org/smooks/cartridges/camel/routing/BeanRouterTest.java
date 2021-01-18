@@ -50,6 +50,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.SmooksException;
+import org.smooks.cartridges.camel.processor.SmooksProcessor;
 import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
@@ -167,7 +168,7 @@ public class BeanRouterTest extends CamelTestSupport {
 	}
 
 	private void setExchangeAsAttributeInExecutionContext(Exchange exchange) {
-		when(smooksExecutionContext.getAttribute(Exchange.class)).thenReturn(exchange);
+		when(smooksExecutionContext.get(SmooksProcessor.EXCHANGE_TYPED_KEY)).thenReturn(exchange);
 	}
 
 	private void makeExecutionContextReturnBeanContext(BeanContext beanContext) {

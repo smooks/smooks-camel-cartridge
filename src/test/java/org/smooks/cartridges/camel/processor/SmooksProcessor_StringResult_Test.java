@@ -66,7 +66,7 @@ public class SmooksProcessor_StringResult_Test extends CamelTestSupport {
             }
         });
         
-        assertEquals("<x />", DirectBProcessor.inMessage);
+        assertEquals("<x/>", DirectBProcessor.inMessage);
     }
 
 	/* (non-Javadoc)
