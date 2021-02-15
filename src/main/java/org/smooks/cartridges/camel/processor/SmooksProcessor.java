@@ -65,6 +65,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -186,6 +187,10 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
             return new StreamSource((Reader) payload);
         }
 
+        if (payload instanceof WrappedFile) {
+            return new StreamSource((File) exchange.getIn().getBody(WrappedFile.class).getFile());
+        }
+        
         return exchange.getIn().getBody(Source.class);
     }
 
