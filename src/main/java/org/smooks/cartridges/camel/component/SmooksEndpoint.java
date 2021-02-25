@@ -45,7 +45,7 @@ package org.smooks.cartridges.camel.component;
 import org.apache.camel.Component;
 import org.apache.camel.Service;
 import org.apache.camel.support.ProcessorEndpoint;
-import org.smooks.SmooksException;
+import org.smooks.api.SmooksException;
 import org.smooks.cartridges.camel.processor.SmooksProcessor;
 
 /**
@@ -57,18 +57,15 @@ import org.smooks.cartridges.camel.processor.SmooksProcessor;
  * @author Daniel Bevenius
  * 
  */
-public class SmooksEndpoint extends ProcessorEndpoint implements Service
-{
-    private SmooksProcessor smooksProcesor;
+public class SmooksEndpoint extends ProcessorEndpoint implements Service {
+    private final SmooksProcessor smooksProcesor;
 
-    public SmooksEndpoint(String endpointUri, Component component, SmooksProcessor processor)
-    {
+    public SmooksEndpoint(String endpointUri, Component component, SmooksProcessor processor) {
         super(endpointUri, component, processor);
         this.smooksProcesor = processor;
     }
 
-    public void start()
-    {
+    public void start() {
         try {
             smooksProcesor.start();
         } catch (Exception e) {
@@ -76,8 +73,7 @@ public class SmooksEndpoint extends ProcessorEndpoint implements Service
         }
     }
 
-    public void stop()
-    {
+    public void stop() {
         try {
             smooksProcesor.stop();
         } catch (Exception e) {

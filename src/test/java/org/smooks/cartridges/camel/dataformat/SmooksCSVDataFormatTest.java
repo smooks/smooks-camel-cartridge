@@ -53,7 +53,7 @@ import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
-import org.smooks.payload.JavaSourceWithoutEventStream;
+import org.smooks.io.payload.JavaSourceWithoutEventStream;
 
 import java.util.ArrayList;
 import java.util.List;

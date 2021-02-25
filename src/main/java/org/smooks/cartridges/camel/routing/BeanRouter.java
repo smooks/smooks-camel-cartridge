@@ -46,19 +46,21 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.smooks.SmooksException;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
+import org.smooks.api.delivery.ordering.Consumer;
+import org.smooks.api.expression.ExecutionContextExpressionEvaluator;
+import org.smooks.api.lifecycle.ExecutionLifecycleCleanable;
+import org.smooks.api.lifecycle.ExecutionLifecycleInitializable;
+import org.smooks.api.resource.config.ResourceConfig;
+import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
-import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.ordering.Consumer;
-import org.smooks.delivery.sax.ng.AfterVisitor;
-import org.smooks.expression.ExecutionContextExpressionEvaluator;
-import org.smooks.lifecycle.ExecutionLifecycleCleanable;
-import org.smooks.lifecycle.ExecutionLifecycleInitializable;
-import org.smooks.util.FreeMarkerTemplate;
-import org.smooks.util.FreeMarkerUtils;
+import org.smooks.cartridges.javabean.BeanMapExpressionEvaluator;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.support.FreeMarkerTemplate;
+import org.smooks.support.FreeMarkerUtils;
 import org.w3c.dom.Element;
 
 import javax.annotation.PostConstruct;
@@ -80,6 +82,9 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     @Inject
     private String toEndpoint;
 
+    @Inject
+    private Optional<String> condition;
+    
     @Inject
     private Optional<String> correlationIdName;
 
@@ -106,20 +111,22 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     @PostConstruct
     public void postConstruct() {
         if (resourceConfig == null) {
-            resourceConfig = new ResourceConfig();
+            resourceConfig = new DefaultResourceConfig();
         }
 
         producerTemplate = getCamelContext().createProducerTemplate();
         if (isBeanRoutingConfigured()) {
             camelRouterObserable = new BeanRouterObserver(this, beanId);
-            camelRouterObserable.setConditionEvaluator((ExecutionContextExpressionEvaluator) resourceConfig.getSelectorPath().getConditionEvaluator());
+            if (condition != null && condition.isPresent()) {
+                camelRouterObserable.setConditionEvaluator(new BeanMapExpressionEvaluator(condition.get()));
+            }
         }
 
         if ((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
-            throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdName', but 'correlationIdPattern' is not configured.");
+            throw new SmooksConfigException("Camel router component configured with a 'correlationIdName', but 'correlationIdPattern' is not configured.");
         }
         if ((correlationIdName == null || !correlationIdName.isPresent()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
-            throw new SmooksConfigurationException("Camel router component configured with a 'correlationIdPattern', but 'correlationIdName' is not configured.");
+            throw new SmooksConfigException("Camel router component configured with a 'correlationIdPattern', but 'correlationIdName' is not configured.");
         }
     }
 

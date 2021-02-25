@@ -44,7 +44,7 @@ package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
 import org.smooks.cartridges.camel.Coordinate;
-import org.smooks.payload.JavaResult;
+import org.smooks.io.payload.JavaResult;
 
 import java.util.Map;
 

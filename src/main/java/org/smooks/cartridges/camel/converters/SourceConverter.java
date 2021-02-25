@@ -44,9 +44,9 @@ package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
 import org.apache.camel.component.file.GenericFile;
-import org.smooks.payload.JavaResult;
-import org.smooks.payload.JavaSource;
-import org.smooks.payload.JavaSourceWithoutEventStream;
+import org.smooks.io.payload.JavaResult;
+import org.smooks.io.payload.JavaSource;
+import org.smooks.io.payload.JavaSourceWithoutEventStream;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;

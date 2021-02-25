@@ -46,7 +46,7 @@ import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.Before;
 import org.junit.Test;
-import org.smooks.payload.JavaSourceWithoutEventStream;
+import org.smooks.io.payload.JavaSourceWithoutEventStream;
 
 import java.util.Map;
 

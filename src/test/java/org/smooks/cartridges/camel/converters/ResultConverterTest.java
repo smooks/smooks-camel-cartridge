@@ -53,7 +53,7 @@ import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.Before;
 import org.junit.Test;
-import org.smooks.payload.StringResult;
+import org.smooks.io.payload.StringResult;
 
 /**
  * Unit test for {@link ResultConverter}.

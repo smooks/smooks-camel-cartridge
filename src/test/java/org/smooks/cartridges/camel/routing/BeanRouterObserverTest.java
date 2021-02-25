@@ -46,10 +46,11 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;
 import org.junit.Test;
-import org.smooks.container.MockExecutionContext;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
-import org.smooks.javabean.lifecycle.BeanLifecycle;
-import org.smooks.javabean.repository.BeanId;
+import org.smooks.api.bean.lifecycle.BeanContextLifecycleEvent;
+import org.smooks.api.bean.lifecycle.BeanLifecycle;
+import org.smooks.api.bean.repository.BeanId;
+import org.smooks.engine.bean.repository.DefaultBeanId;
+import org.smooks.tck.MockExecutionContext;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -86,7 +87,7 @@ public class BeanRouterObserverTest extends CamelTestSupport
         final MockExecutionContext smooksExecutionContext = new MockExecutionContext();
         final BeanContextLifecycleEvent event = mock(BeanContextLifecycleEvent.class);
         
-        when(event.getBeanId()).thenReturn(new BeanId(null, 0, beanId));
+        when(event.getBeanId()).thenReturn(new DefaultBeanId(null, 0, beanId));
         when(event.getLifecycle()).thenReturn(BeanLifecycle.END_FRAGMENT);
         when(event.getBean()).thenReturn(sampleBean);
         when(event.getExecutionContext()).thenReturn(smooksExecutionContext);

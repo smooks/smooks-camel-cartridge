@@ -46,8 +46,8 @@ import org.apache.camel.Converter;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.spi.TypeConverterRegistry;
-import org.smooks.payload.JavaResult;
-import org.smooks.payload.StringResult;
+import org.smooks.io.payload.JavaResult;
+import org.smooks.io.payload.StringResult;
 import org.w3c.dom.Node;
 
 import javax.xml.transform.Result;

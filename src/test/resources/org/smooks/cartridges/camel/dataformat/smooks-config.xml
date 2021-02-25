@@ -56,7 +56,7 @@
     </jb:bean>
     
     <core:exports>
-        <core:result type="org.smooks.payload.JavaResult" extract="cust"/>
+        <core:result type="org.smooks.io.payload.JavaResult" extract="cust"/>
     </core:exports>
     
 </smooks-resource-list>

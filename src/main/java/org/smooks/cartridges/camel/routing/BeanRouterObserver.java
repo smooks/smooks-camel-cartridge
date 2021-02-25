@@ -42,12 +42,12 @@
  */
 package org.smooks.cartridges.camel.routing;
 
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.lifecycle.BeanContextLifecycleEvent;
+import org.smooks.api.bean.lifecycle.BeanContextLifecycleObserver;
+import org.smooks.api.bean.lifecycle.BeanLifecycle;
+import org.smooks.api.expression.ExecutionContextExpressionEvaluator;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.expression.ExecutionContextExpressionEvaluator;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleObserver;
-import org.smooks.javabean.lifecycle.BeanLifecycle;
 
 /**
  * BeanRouterObserver is a {@link BeanContextLifecycleObserver} that will route 
@@ -56,9 +56,8 @@ import org.smooks.javabean.lifecycle.BeanLifecycle;
  * 
  * @author Daniel Bevenius
  */
-public class BeanRouterObserver implements BeanContextLifecycleObserver
-{
-    private BeanRouter beanRouter;
+public class BeanRouterObserver implements BeanContextLifecycleObserver {
+    private final BeanRouter beanRouter;
     private final String beanId;
     private ExecutionContextExpressionEvaluator conditionEvaluator;
 
@@ -97,14 +96,12 @@ public class BeanRouterObserver implements BeanContextLifecycleObserver
         }
     }
 
-    private boolean endEventAndBeanIdMatch(final BeanContextLifecycleEvent event)
-    {
+    private boolean endEventAndBeanIdMatch(final BeanContextLifecycleEvent event) {
         return event.getLifecycle() == BeanLifecycle.END_FRAGMENT && event.getBeanId().getName().equals(beanId);
-
     }
 
     public boolean conditionsMatch(BeanContextLifecycleEvent event) {
-        if(conditionEvaluator == null) {
+        if (conditionEvaluator == null) {
             return true;
         }
 
