@@ -50,9 +50,9 @@ import org.junit.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.javabean.Value;
-import org.smooks.payload.Exports;
-import org.smooks.payload.JavaResult;
-import org.smooks.payload.StringSource;
+import org.smooks.io.payload.Exports;
+import org.smooks.io.payload.JavaResult;
+import org.smooks.io.payload.StringSource;
 import org.smooks.cartridges.camel.Coordinate;
 
 import java.util.Map;

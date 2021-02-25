@@ -49,18 +49,18 @@ import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.SmooksException;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.bean.context.BeanContext;
+import org.smooks.api.bean.lifecycle.BeanLifecycle;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.camel.processor.SmooksProcessor;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.container.standalone.StandaloneExecutionContext;
-import org.smooks.injector.Scope;
-import org.smooks.javabean.context.BeanContext;
-import org.smooks.javabean.lifecycle.BeanContextLifecycleEvent;
-import org.smooks.javabean.lifecycle.BeanLifecycle;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.engine.bean.lifecycle.DefaultBeanContextLifecycleEvent;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.tck.MockApplicationContext;
 
 import java.io.IOException;
 
@@ -78,7 +78,7 @@ public class BeanRouterTest extends CamelTestSupport {
 	private static final String BEAN_ID = "testBeanId";
 	private static final String HEADER_ID = "testHeaderId";
 
-	private StandaloneExecutionContext smooksExecutionContext;
+	private ExecutionContext smooksExecutionContext;
 	private MockEndpoint endpoint;
 	private MyBean myBean = new MyBean("bajja");
 	private BeanContext beanContext;
@@ -110,7 +110,7 @@ public class BeanRouterTest extends CamelTestSupport {
 		execContext.getBeanContext().addBean(BEAN_ID, myBean);
 
 		// Force an END event
-		execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
+		execContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(execContext,
 				null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
 
 		endpoint.assertIsSatisfied();
@@ -130,7 +130,7 @@ public class BeanRouterTest extends CamelTestSupport {
 		execContext.getBeanContext().addBean(HEADER_ID, myBean);
 
 		// Force an END event
-		execContext.getBeanContext().notifyObservers(new BeanContextLifecycleEvent(execContext,
+		execContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(execContext,
 				null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
 
 		endpoint.assertIsSatisfied();
@@ -142,7 +142,7 @@ public class BeanRouterTest extends CamelTestSupport {
 		Exchange exchange = createExchange(endpoint);
 		BeanContext beanContext = createBeanContextAndSetBeanInContext(BEAN_ID, myBean);
 
-		smooksExecutionContext = createStandaloneExecutionContext();
+		smooksExecutionContext = createExecutionContext();
 		setExchangeAsAttributeInExecutionContext(exchange);
 		makeExecutionContextReturnBeanContext(beanContext);
 	}
@@ -163,8 +163,8 @@ public class BeanRouterTest extends CamelTestSupport {
 		return beanContext;
 	}
 
-	private StandaloneExecutionContext createStandaloneExecutionContext() {
-		return mock(StandaloneExecutionContext.class);
+	private ExecutionContext createExecutionContext() {
+		return mock(ExecutionContext.class);
 	}
 
 	private void setExchangeAsAttributeInExecutionContext(Exchange exchange) {
@@ -181,7 +181,7 @@ public class BeanRouterTest extends CamelTestSupport {
 
 	private BeanRouter createBeanRouter(String selector, String beanId, String endpointUri) {
 		BeanRouter beanRouter = new BeanRouter();
-		ResourceConfig resourceConfig = new ResourceConfig();
+		ResourceConfig resourceConfig = new DefaultResourceConfig();
 		if (selector != null) {
 			resourceConfig.setSelector(selector);
 		}

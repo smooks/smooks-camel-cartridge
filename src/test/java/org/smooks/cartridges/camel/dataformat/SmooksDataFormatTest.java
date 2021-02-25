@@ -56,7 +56,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.io.StreamUtils;
-import org.smooks.payload.JavaSource;
+import org.smooks.io.payload.JavaSource;
 
 import java.io.IOException;
 import java.io.InputStream;

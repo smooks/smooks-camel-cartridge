@@ -48,9 +48,9 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 import org.smooks.Smooks;
-import org.smooks.payload.Exports;
-import org.smooks.payload.StringResult;
-import org.smooks.payload.StringSource;
+import org.smooks.io.payload.Exports;
+import org.smooks.io.payload.StringResult;
+import org.smooks.io.payload.StringSource;
 
 /**
  * 

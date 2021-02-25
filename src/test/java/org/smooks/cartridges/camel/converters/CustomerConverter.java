@@ -44,8 +44,8 @@ package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
 import org.smooks.cartridges.camel.dataformat.Customer;
-import org.smooks.payload.JavaResult;
-import org.smooks.payload.JavaSource;
+import org.smooks.io.payload.JavaResult;
+import org.smooks.io.payload.JavaSource;
 
 import javax.xml.transform.Source;
 import java.util.Map;
