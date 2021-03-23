@@ -56,7 +56,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.smooks.io.StreamUtils;
+import org.smooks.support.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
