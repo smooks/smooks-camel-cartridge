@@ -1,0 +1,129 @@
+= Smooks Camel Cartridge
+
+image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-camel-cartridge[Maven Central]
+image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-camel-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
+image:https://github.com/smooks/smooks-camel-cartridge/workflows/CI/badge.svg[Build Status]
+
+// tag::smooks-camel-cartridge[]
+It is possible to route fragments to Apache Camel endpoints using the `+<camel:route>+` configuration from the `+https://www.smooks.org/xsd/smooks/camel-1.5.xsd+` configuration namespace.
+
+For example, you can route to Camel endpoint by specifying the following in your Smooks configuration:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:camel="https://www.smooks.org/xsd/smooks/camel-1.5.xsd">
+
+  <!-- Create some bean instances from the input source... -->
+  <jb:bean beanId="orderItem"  ...>
+    <!-- etc... See Smooks Java Binding docs -->
+  </jb:bean>
+
+  <!-- Route bean to camel endpoints... -->
+  <camel:route beanid="orderItem">
+    <camel:to endpoint="direct:slow" if="orderItem.priority == 'Normal'"/>
+    <camel:to endpoint="direct:express" if="orderItem.priority == 'High'"/>
+  </camel:route>
+
+</smooks-resource-list>
+----
+
+In the above example, we route Java Beans from Smooks's `+BeanContext+` to the Camel Endpoints. Note that you can also apply templates (e.g., FreeMarker) to these same beans and route the templating result instead of beans (e.g., as XML, CSV or other).
+
+The above configuration shows routing using the `+beanId+` attribute. It is also possible to route using an attribute named `+routeOnElement+`.
+
+== Apache Camel Integration
+
+Integrating Smooks from Apache Camel lets you to access all the features of Smooks from within Camel. You can take an existing Smooks configuration and use this in your Camel routes using one of the options that are described in this chapter.
+
+Using Smooks in Camel can be done in three ways:
+
+=== SmooksComponent
+
+The `+SmooksComponent+` is a Camel https://camel.apache.org/component.html[Component] which can used when  you want to process the Camel Message Body using Smooks. You can do this by adding a route in your Camel route configuration:
+
+[source,java]
+----
+from("file://inputDir?noop=true")
+.to("smooks://smooks-config.xml")
+.to("jms:queue:order")
+----
+
+The Smooks Component is configured with a mandatory configuration file, which is _smooks-config-xml_ in the example above. By just looking at the above route definition it is not clear what type of output that the SmooksComponent is producing. This is actually expressed in the Smooks configuration using the https://www.smooks.org/v2/documentation/#exporting_results[exports] element.
+
+If you prefer/require programmatic configuration of Smooks you can use the link:#smooksprocessor[`+SmooksProcessor+`] to achieve this.
+
+==== Options
+
+An Apache Component can take options that are specified after the Smooks configuration file. Currently only one option is available for the SmooksComponent:
+
+. `+reportPath+` which is path (including the file name) to the Smooks Execution Report to be generated.
+
+=== SmooksDataFormat
+
+`+SmooksDataFormat+` is a Camel DataFormat which is capable of transforming from one data format to another and back again. You would use this when you are only interested in transforming from one format to another and not interested in other Smooks features.
+
+Below is an example of using `+SmooksDataFormat+` to transform a comma separated value string into a `+java.util.List+` of Customer object instances:
+
+[source,java]
+----
+SmooksDataFormat sdf = new SmooksDataFormat("csv-smooks-unmarshal-config.xml");
+from("direct:unmarshal")
+.unmarshal(sdf)
+.convertBodyTo(List.class)
+.to("mock:result");
+----
+
+=== SmooksProcessor
+
+Using `+SmooksProcessor+` gives you full control over Smooks, for example if you want to programatically create the underlying Smooks instance you’d use `+SmooksProcessor+`. When using `+SmooksProcessor+`, you can pass a Smooks instance to its constructor and prior to that programmatically configure Smooks.
+
+Below is an example of using the `+SmooksProcessor+` in a Camel route:
+
+[source,java]
+----
+Smooks smooks = new Smooks("edi-to-xml-smooks-config.xml");
+ExecutionContext context = smooks.createExecutionContext();
+...
+SmooksProcessor processor = new SmooksProcessor(smooks, context);
+
+from("file://input?noop=true")
+.process(processor)
+.to("mock:result");
+----
+
+Similar to the `+SmooksComponent+` we have not specified the result type that Smooks produces (if any that is). Instead this is expressed in the Smooks configuration using the https://www.smooks.org/v2/documentation/#exporting_results[exports] element, or you can do the same programmatically like this:
+
+[source,java]
+----
+Smooks smooks = new Smooks();
+ExecutionContext context = smooks.createExecutionContext();
+smooks.setExports(new Exports(StringResult.class));
+SmooksProcessor processor = new SmooksProcessor(smooks, context);
+...
+from("file://input?noop=true")
+.process(processor)
+.to("mock:result");
+----
+
+TIP: See the https://github.com/smooks/smooks-examples/tree/v1.0.2/camel[Apache Camel examples] in the examples page.
+
+== Maven Coordinates
+
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>org.smooks.cartridges</groupId>
+    <artifactId>smooks-camel-cartridge</artifactId>
+    <version>2.0.0-M3</version>
+</dependency>
+----
+// end::smooks-camel-cartridge[]
+
+== License
+
+Smooks Camel Cartridge is open source and licensed under the terms of the Apache License Version 2.0, or the GNU Lesser General Public License version 3.0 or later. You may use Smooks Camel Cartridge according to either of these licenses as is most appropriate for your project.
+
+`+SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later+`
