@@ -128,6 +128,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
             executionContext.setContentEncoding(charsetName);
         }
         exchange.getIn().setHeader(SMOOKS_EXECUTION_CONTEXT, executionContext);
+        executionContext.getBeanContext().addBean("MESSAGE_HEADERS", exchange.getMessage().getHeaders());
         setupSmooksReporting(executionContext);
 
         final Exports exports = smooks.getApplicationContext().getRegistry().lookup(new ExportsLookup());
