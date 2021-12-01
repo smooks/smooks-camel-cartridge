@@ -75,9 +75,10 @@ public class SmooksProcessor_CharacterEncoding_Test extends CamelTestSupport {
 			@Override
 			public void configure() throws Exception
 			{
+                Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
                 from("direct:a")
-                .process(new SmooksProcessor(new Smooks().setExports(new Exports(JavaResult.class)), context)
-                .addVisitor(new Value("customer", "/order/header/customer", String.class)));
+                .process(new SmooksProcessor(smooks, context)
+                .addVisitor(new Value("customer", "/order/header/customer", String.class, smooks.getApplicationContext().getRegistry())));
 			}
 			
 		});

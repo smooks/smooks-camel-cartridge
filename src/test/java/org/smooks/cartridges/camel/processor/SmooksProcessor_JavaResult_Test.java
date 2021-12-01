@@ -71,13 +71,14 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 	
 	@Test
     public void test_single_value() throws Exception {
-		context.addRoutes(new RouteBuilder() {
+        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        context.addRoutes(new RouteBuilder() {
 			@Override
 			public void configure() throws Exception
 			{
                 from("direct:a")
-                .process(new SmooksProcessor(new Smooks().setExports(new Exports(JavaResult.class)), context)
-                .addVisitor(new Value("x", "/coord/@x", Integer.class)));
+                .process(new SmooksProcessor(smooks, context)
+                .addVisitor(new Value("x", "/coord/@x", Integer.class, smooks.getApplicationContext().getRegistry())));
 			}
 			
 		});
@@ -93,13 +94,14 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 
 	@Test
     public void test_multi_value() throws Exception {
-		context.addRoutes(new RouteBuilder() {
+        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        context.addRoutes(new RouteBuilder() {
 			@Override
 			public void configure() throws Exception
 			{
-                from("direct:b").process(new SmooksProcessor(new Smooks().setExports(new Exports(JavaResult.class)), context).
-                		addVisitor(new Value("x", "/coord/@x", Integer.class)).
-                		addVisitor(new Value("y", "/coord/@y", Double.class)));
+                from("direct:b").process(new SmooksProcessor(smooks, context).
+                		addVisitor(new Value("x", "/coord/@x", Integer.class, smooks.getApplicationContext().getRegistry())).
+                		addVisitor(new Value("y", "/coord/@y", Double.class, smooks.getApplicationContext().getRegistry())));
 			}
 		});
 		context.start();
@@ -117,12 +119,13 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 	
 	@Test
     public void test_bean() throws Exception {
-		context.addRoutes(new RouteBuilder() {
+        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        context.addRoutes(new RouteBuilder() {
 			@Override
 			public void configure() throws Exception
 			{
-                from("direct:c").process(new SmooksProcessor(new Smooks().setExports(new Exports(JavaResult.class)), context).
-            		addVisitor(new Bean(Coordinate.class, "coordinate").
+                from("direct:c").process(new SmooksProcessor(smooks, context).
+            		addVisitor(new Bean(Coordinate.class, "coordinate", smooks.getApplicationContext().getRegistry()).
     				bindTo("x", "/coord/@x").
     				bindTo("y", "/coord/@y")));
 			}
