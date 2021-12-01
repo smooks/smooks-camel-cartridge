@@ -48,6 +48,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
+import org.smooks.Smooks;
 import org.smooks.cartridges.camel.Coordinate;
 import org.smooks.cartridges.camel.routing.BeanRouter;
 import org.smooks.cartridges.javabean.Bean;
@@ -76,14 +77,15 @@ public class SmooksProcessor_BeanRouting_Test extends CamelTestSupport {
         final String toEndpoint = "mock:to";
         context.addRoutes(new RouteBuilder() {
             public void configure() {
-                final SmooksProcessor smooksProcessor = new SmooksProcessor(context);
+                Smooks smooks = new Smooks();
+                final SmooksProcessor smooksProcessor = new SmooksProcessor(smooks, context);
 
                 // Smooks JavaBean programmatic configuration
                 final String beanId = "coordinate";
                 final String selector = "coords/coord";
-                final Bean beanConfig = new Bean(Coordinate.class, beanId, selector);
-                beanConfig.bindTo("x", "coords/coord/@x").bindTo("y", "coords/coord/@y");
-                smooksProcessor.addVisitor(beanConfig);
+                final Bean bean = new Bean(Coordinate.class, beanId, selector, smooks.getApplicationContext().getRegistry());
+                bean.bindTo("x", "coords/coord/@x").bindTo("y", "coords/coord/@y");
+                smooksProcessor.addVisitor(bean);
 
                 // Smooks Camel BeanRouter programmatic configuration
                 final BeanRouter camelBeanRouter = new BeanRouter(context);

@@ -63,6 +63,7 @@ import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.tck.MockApplicationContext;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -137,7 +138,7 @@ public class BeanRouterTest extends CamelTestSupport {
 	}
 
 	@Before
-	public void setupSmooksExeceutionContext() throws Exception {
+	public void setupSmooksExecutionContext() throws Exception {
 		endpoint = createAndConfigureMockEndpoint(END_POINT_URI);
 		Exchange exchange = createExchange(endpoint);
 		BeanContext beanContext = createBeanContextAndSetBeanInContext(BEAN_ID, myBean);
@@ -183,7 +184,7 @@ public class BeanRouterTest extends CamelTestSupport {
 		BeanRouter beanRouter = new BeanRouter();
 		ResourceConfig resourceConfig = new DefaultResourceConfig();
 		if (selector != null) {
-			resourceConfig.setSelector(selector);
+			resourceConfig.setSelector(selector, new Properties());
 		}
 		resourceConfig.setParameter("beanId", beanId);
 		resourceConfig.setParameter("toEndpoint", endpointUri);
