@@ -55,7 +55,9 @@ import org.smooks.cartridges.javabean.Bean;
 import org.smooks.io.payload.StringSource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
 
@@ -122,6 +124,31 @@ public class SmooksProcessor_BeanRouting_Test extends CamelTestSupport {
         assertThat((Coordinate) messageC.getBody(), is(new Coordinate(300, 400)));
         assertThat(messageB.getHeader(CORRELATION_ID), is(equalTo(messageC.getHeader(CORRELATION_ID))));
     }
+
+    @Test
+    public void processSmooksXmlConfiguredWithHeaders() throws Exception {
+        final String fromEndpoint = "direct:a3";
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
+                from(fromEndpoint).to("smooks://bean_routing_02.xml");
+            }
+        });
+        context.start();
+
+        final Map<String, Object> headers = new HashMap<>();
+        headers.put("TEST_HEADER", "test");
+        sendBody(fromEndpoint, new StringSource("<coords><coord x='1' y='2' /><coord x='300' y='400' /></coords>"), headers);
+
+        final Message messageB = getExchange(getMockEndpoint("mock:b"));
+        Map originalHeaders = messageB.getHeader("MESSAGE_HEADERS", Map.class);
+        assertEquals("test", originalHeaders.get("TEST_HEADER"));
+
+        final Message messageC = getExchange(getMockEndpoint("mock:c"));
+        originalHeaders = messageC.getHeader("MESSAGE_HEADERS", Map.class);
+        assertEquals("test", originalHeaders.get("TEST_HEADER"));
+    }
+
 
     private Message getExchange(final MockEndpoint mockEndpoint) {
         return mockEndpoint.getExchanges().get(0).getIn();
