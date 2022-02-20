@@ -42,7 +42,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <camel.version>3.14.1</camel.version>
+        <camel.version>3.15.0</camel.version>
     </properties>
 
     <build>
