@@ -4,6 +4,10 @@ image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-camel-
 image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-camel-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-camel-cartridge/workflows/CI/badge.svg[Build Status]
 
+== Requirements
+
+* Java 11 or higher
+
 // tag::smooks-camel-cartridge[]
 It is possible to route fragments to Apache Camel endpoints using the `+<camel:route>+` configuration from the `+https://www.smooks.org/xsd/smooks/camel-1.5.xsd+` configuration namespace.
 
