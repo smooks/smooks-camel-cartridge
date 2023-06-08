@@ -42,6 +42,8 @@
  */
 package org.smooks.cartridges.camel.routing;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
@@ -51,7 +53,6 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksConfigException;
 import org.smooks.api.SmooksException;
 import org.smooks.api.delivery.ordering.Consumer;
-import org.smooks.api.expression.ExecutionContextExpressionEvaluator;
 import org.smooks.api.lifecycle.ExecutionLifecycleCleanable;
 import org.smooks.api.lifecycle.ExecutionLifecycleInitializable;
 import org.smooks.api.resource.config.ResourceConfig;
@@ -63,8 +64,6 @@ import org.smooks.support.FreeMarkerTemplate;
 import org.smooks.support.FreeMarkerUtils;
 import org.w3c.dom.Element;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.util.Optional;
 
