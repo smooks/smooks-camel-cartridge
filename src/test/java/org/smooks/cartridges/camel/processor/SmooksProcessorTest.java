@@ -51,14 +51,13 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spi.ManagementAgent;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.test.junit4.CamelTestSupport;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.smooks.support.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xmlunit.builder.DiffBuilder;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -68,7 +67,6 @@ import javax.management.ObjectName;
 import java.io.*;
 import java.util.Set;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.*;
 
 /**
@@ -81,11 +79,6 @@ public class SmooksProcessorTest extends CamelTestSupport {
     @EndpointInject(value = "mock:result")
     private MockEndpoint result;
     private MBeanServer mbeanServer;
-
-    @BeforeClass
-    public static void setup() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
 
     @Before
     public void getMbeanServer() {
@@ -111,7 +104,11 @@ public class SmooksProcessorTest extends CamelTestSupport {
 
         Exchange exchange = result.assertExchangeReceived(0);
         assertIsInstanceOf(Document.class, exchange.getIn().getBody());
-        assertXMLEqual(getExpectedOrderXml(), exchange.getIn().getBody(String.class));
+        assertFalse(DiffBuilder.compare(getExpectedOrderXml()).withTest(exchange.getIn().getBody(String.class)).
+                ignoreComments().
+                ignoreWhitespace().
+                build().
+                hasDifferences());
     }
 
     @Test
@@ -210,7 +207,7 @@ public class SmooksProcessorTest extends CamelTestSupport {
         return StreamUtils.readStream(new InputStreamReader(getClass().getResourceAsStream("/data/order.edi")));
     }
 
-    private class StringDataSource implements DataSource {
+    private static class StringDataSource implements DataSource {
         private final String string;
 
         private StringDataSource(final String string) {
