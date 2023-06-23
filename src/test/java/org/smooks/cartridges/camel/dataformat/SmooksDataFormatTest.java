@@ -50,19 +50,17 @@ import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.support.processor.MarshalProcessor;
 import org.apache.camel.support.processor.UnmarshalProcessor;
 import org.apache.camel.test.junit4.CamelTestSupport;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.io.payload.JavaSource;
 import org.smooks.support.StreamUtils;
+import org.xmlunit.builder.DiffBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 /**
  * Unit test for {@link SmooksDataFormat}
@@ -85,7 +83,6 @@ public class SmooksDataFormatTest extends CamelTestSupport
         dataFormatter = new SmooksDataFormat(SMOOKS_CONFIG);
         dataFormatter.setCamelContext(camelContext);
         dataFormatter.start();
-        XMLUnit.setIgnoreWhitespace(true);
     }
     
     @After
@@ -99,8 +96,7 @@ public class SmooksDataFormatTest extends CamelTestSupport
         // each unit test include their own route builder
         return false;
     }
-    
-    
+
     @Test
     public void unmarshal() throws Exception
     {
@@ -128,8 +124,13 @@ public class SmooksDataFormatTest extends CamelTestSupport
         exchange.getIn().setBody(customer, JavaSource.class);
         
         marshalProcessor.process(exchange);
-        
-        assertXMLEqual(getCustomerXml(CUSTOMER_XML_EXPECTED), exchange.getOut().getBody(String.class));
+
+        assertFalse(DiffBuilder.compare(getCustomerXml(CUSTOMER_XML_EXPECTED)).
+                withTest(exchange.getOut().getBody(String.class)).
+                ignoreComments().
+                ignoreWhitespace().
+                build().
+                hasDifferences());
     }
     
     @Test
@@ -152,7 +153,12 @@ public class SmooksDataFormatTest extends CamelTestSupport
                 exchange.getIn().setBody(getCustomerInputStream(CUSTOMER_XML));
             }
         });
-        assertXMLEqual(getCustomerXml(CUSTOMER_XML_EXPECTED), exchange.getOut().getBody(String.class));
+
+        assertFalse(DiffBuilder.compare(getCustomerXml(CUSTOMER_XML_EXPECTED)).withTest(exchange.getOut().getBody(String.class)).
+                ignoreComments().
+                ignoreWhitespace().
+                build().
+                hasDifferences());
     }
     
     private InputStream getCustomerInputStream(final String resource)
