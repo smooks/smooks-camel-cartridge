@@ -50,7 +50,7 @@
     <!--
     Configure the EDI Reader to process the message stream into a stream of SAX events.
     -->
-    <edi:parser schemaURI="edi-mapping-model.dfdl.xsd" segmentTerminator="%NL;" dataElementSeparator="*"
+    <edi:parser schemaUri="edi-mapping-model.dfdl.xsd" segmentTerminator="%NL;" dataElementSeparator="*"
                 compositeDataElementSeparator="^"/>
     
     <core:exports>
