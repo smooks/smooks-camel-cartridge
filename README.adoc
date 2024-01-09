@@ -111,7 +111,7 @@ from("file://input?noop=true")
 .to("mock:result");
 ----
 
-TIP: See the https://github.com/smooks/smooks-examples/tree/v1.0.2/camel[Apache Camel examples] in the examples page.
+TIP: See the https://github.com/smooks/smooks-examples/tree/v1.0.5/camel[Apache Camel examples] in the examples page.
 
 == Maven Coordinates
 
