@@ -46,12 +46,16 @@ import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.support.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xmlunit.builder.DiffBuilder;
+
+import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
+import static org.apache.camel.test.junit5.TestSupport.assertIsInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Unit test for {@link SmooksComponent}.
@@ -61,14 +65,14 @@ import org.xmlunit.builder.DiffBuilder;
  */
 public class SmooksComponentTest extends CamelTestSupport {
     @EndpointInject(value = "mock:result")
-    private MockEndpoint result;
+    private MockEndpoint mockEndpoint;
 
     @Test
     public void unmarshalEDI() throws Exception {
-        result.expectedMessageCount(1);
-        assertMockEndpointsSatisfied();
+        mockEndpoint.expectedMessageCount(1);
+        assertIsSatisfied(mockEndpoint);
 
-        Exchange exchange = result.assertExchangeReceived(0);
+        Exchange exchange = mockEndpoint.assertExchangeReceived(0);
 
         assertIsInstanceOf(Document.class, exchange.getIn().getBody());
         assertFalse(DiffBuilder.compare(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/xml/expected-order.xml"), "UTF-8")).

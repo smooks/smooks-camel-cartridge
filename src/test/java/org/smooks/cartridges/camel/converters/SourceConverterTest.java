@@ -42,10 +42,11 @@
  */
 package org.smooks.cartridges.camel.converters;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.smooks.io.payload.JavaSourceWithoutEventStream;
 
 import java.util.Map;
@@ -62,9 +63,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SourceConverterTest {
     private TypeConverter typeConverter;
 
-    @Before
-    public void getTypeConverter() {
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+    @BeforeEach
+    public void beforeEach() {
+        CamelContext camelContext = new DefaultCamelContext();
         typeConverter = camelContext.getTypeConverter();
     }
 

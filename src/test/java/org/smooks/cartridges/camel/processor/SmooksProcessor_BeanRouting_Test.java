@@ -46,8 +46,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.camel.Coordinate;
 import org.smooks.cartridges.camel.routing.BeanRouter;
@@ -57,7 +57,9 @@ import org.smooks.io.payload.StringSource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 
 /**
  * Functional test for {@link SmooksProcessor} which test bean routing configured
@@ -116,11 +118,11 @@ public class SmooksProcessor_BeanRouting_Test extends CamelTestSupport {
         sendBody(fromEndpoint, new StringSource("<coords><coord x='1' y='2' /><coord x='300' y='400' /></coords>"));
 
         final Message messageB = getExchange(getMockEndpoint("mock:b"));
-        assertThat((Coordinate) messageB.getBody(), is(new Coordinate(1, 2)));
+        assertThat((Coordinate) messageB.getBody(), equalTo(new Coordinate(1, 2)));
 
         final Message messageC = getExchange(getMockEndpoint("mock:c"));
-        assertThat((Coordinate) messageC.getBody(), is(new Coordinate(300, 400)));
-        assertThat(messageB.getHeader(CORRELATION_ID), is(equalTo(messageC.getHeader(CORRELATION_ID))));
+        assertThat((Coordinate) messageC.getBody(), equalTo(new Coordinate(300, 400)));
+        assertThat(messageB.getHeader(CORRELATION_ID), equalTo(messageC.getHeader(CORRELATION_ID)));
     }
 
     private Message getExchange(final MockEndpoint mockEndpoint) {
@@ -128,7 +130,7 @@ public class SmooksProcessor_BeanRouting_Test extends CamelTestSupport {
     }
 
     private List<Coordinate> getBodies(final List<Exchange> exchanges) {
-        List<Coordinate> bodies = new ArrayList<Coordinate>();
+        List<Coordinate> bodies = new ArrayList<>();
         for (Exchange exchange : exchanges) {
             bodies.add((Coordinate) exchange.getIn().getBody());
         }

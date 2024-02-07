@@ -6,7 +6,8 @@ image:https://github.com/smooks/smooks-camel-cartridge/workflows/CI/badge.svg[Bu
 
 == Requirements
 
-* Java 11 or higher
+* Java 17 or higher
+* Apache Camel 4.x
 
 // tag::smooks-camel-cartridge[]
 It is possible to route fragments to Apache Camel endpoints using the `+<camel:route>+` configuration from the `+https://www.smooks.org/xsd/smooks/camel-1.5.xsd+` configuration namespace.

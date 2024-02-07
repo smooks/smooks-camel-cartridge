@@ -49,48 +49,48 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Value;
 import org.smooks.io.payload.Exports;
 import org.smooks.io.payload.JavaResult;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
- * 
  * @author <a href="mailto:sorin7486@gmail.com">sorin7486@gmail.com</a>
  */
 public class SmooksProcessor_CharacterEncoding_Test extends CamelTestSupport {
-	
+
     @Override
     public boolean isUseRouteBuilder() {
         // each unit test include their own route builder
         return false;
     }
-	
-	@Test
+
+    @Test
     public void test_single_value() throws Exception {
-		
-		context.addRoutes(new RouteBuilder() {
-			@Override
-			public void configure() throws Exception
-			{
+
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() {
                 Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
                 from("direct:a")
-                .process(new SmooksProcessor(smooks, context)
-                .addVisitor(new Value("customer", "/order/header/customer", String.class, smooks.getApplicationContext().getRegistry())));
-			}
-			
-		});
-		enableJMX();
-		context.start();
+                        .process(new SmooksProcessor(smooks, context)
+                                .addVisitor(new Value("customer", "/order/header/customer", String.class, smooks.getApplicationContext().getRegistry())));
+            }
+
+        });
+        enableJMX();
+        context.start();
         Exchange response = template.request("direct:a", new Processor() {
-            public void process(Exchange exchange) throws Exception {
-            	InputStream in = this.getClass().getResourceAsStream("/EBCDIC-input-message");
+            public void process(Exchange exchange) {
+                InputStream in = this.getClass().getResourceAsStream("/EBCDIC-input-message");
                 exchange.getIn().setBody(new StreamSource(in));
-                exchange.setProperty("CamelCharsetName", "Cp1047");
+                    exchange.setProperty("CamelCharsetName", "Cp1047");
             }
         });
-        assertOutMessageBodyEquals(response, "Joe");
+        assertEquals("Joe", response.getMessage().getBody(String.class));
     }
 }

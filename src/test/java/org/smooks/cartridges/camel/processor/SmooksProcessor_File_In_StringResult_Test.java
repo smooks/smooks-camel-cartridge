@@ -44,11 +44,15 @@ package org.smooks.cartridges.camel.processor;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.payload.Exports;
 import org.smooks.io.payload.StringResult;
+
+import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
+import static org.apache.camel.test.junit5.TestSupport.deleteDirectory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 
@@ -61,19 +65,19 @@ public class SmooksProcessor_File_In_StringResult_Test extends CamelTestSupport 
         deleteDirectory("target/smooks");
         template.sendBody("file://target/smooks", "<blah />");
         
-        MockEndpoint mock = getMockEndpoint("mock:a");
-        mock.expectedMessageCount(1);
+        MockEndpoint mockEndpoint = getMockEndpoint("mock:a");
+        mockEndpoint.expectedMessageCount(1);
 
-        assertMockEndpointsSatisfied();
+        assertIsSatisfied(mockEndpoint);
 
-        assertEquals("<blah/>", mock.getExchanges().get(0).getIn().getBody(String.class));
+        assertEquals("<blah/>", mockEndpoint.getExchanges().get(0).getIn().getBody(String.class));
     }
 
 	/* (non-Javadoc)
 	 * @see org.apache.camel.test.junit4.CamelTestSupport#createRouteBuilder()
 	 */
 	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
+	protected RouteBuilder createRouteBuilder() {
 	    
         return new RouteBuilder() {
             public void configure() {

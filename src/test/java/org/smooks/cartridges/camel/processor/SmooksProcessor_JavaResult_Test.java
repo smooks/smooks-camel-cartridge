@@ -45,8 +45,8 @@ package org.smooks.cartridges.camel.processor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.javabean.Value;
@@ -56,6 +56,8 @@ import org.smooks.io.payload.StringSource;
 import org.smooks.cartridges.camel.Coordinate;
 
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 
@@ -74,8 +76,7 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
         Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
         context.addRoutes(new RouteBuilder() {
 			@Override
-			public void configure() throws Exception
-			{
+			public void configure() {
                 from("direct:a")
                 .process(new SmooksProcessor(smooks, context)
                 .addVisitor(new Value("x", "/coord/@x", Integer.class, smooks.getApplicationContext().getRegistry())));
@@ -84,12 +85,8 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 		});
 		enableJMX();
 		context.start();
-        Exchange response = template.request("direct:a", new Processor() {
-            public void process(Exchange exchange) throws Exception {
-                exchange.getIn().setBody(new StringSource("<coord x='1234' />"));
-            }
-        });
-        assertOutMessageBodyEquals(response, 1234);
+        Exchange response = template.request("direct:a", exchange -> exchange.getIn().setBody(new StringSource("<coord x='1234' />")));
+        assertEquals(1234, response.getMessage().getBody(Integer.class));
     }
 
 	@Test

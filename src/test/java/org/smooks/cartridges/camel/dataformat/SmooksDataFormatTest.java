@@ -49,10 +49,10 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.support.processor.MarshalProcessor;
 import org.apache.camel.support.processor.UnmarshalProcessor;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.io.payload.JavaSource;
 import org.smooks.support.StreamUtils;
@@ -62,35 +62,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * Unit test for {@link SmooksDataFormat}
- * 
- * @author Daniel Bevenius
  *
+ * @author Daniel Bevenius
  */
-public class SmooksDataFormatTest extends CamelTestSupport
-{
+public class SmooksDataFormatTest extends CamelTestSupport {
     private static final String SMOOKS_CONFIG = "/org/smooks/cartridges/camel/dataformat/smooks-config.xml";
     private static final String CUSTOMER_XML = "/org/smooks/cartridges/camel/dataformat/customer.xml";
     private static final String CUSTOMER_XML_EXPECTED = "/org/smooks/cartridges/camel/dataformat/customer-expected.xml";
     private DefaultCamelContext camelContext;
     private SmooksDataFormat dataFormatter;
-    
-    @Before
-    public void setup() throws Exception
-    {
+
+    @BeforeEach
+    public void beforeEach() throws Exception {
         camelContext = new DefaultCamelContext();
         dataFormatter = new SmooksDataFormat(SMOOKS_CONFIG);
         dataFormatter.setCamelContext(camelContext);
         dataFormatter.start();
     }
-    
-    @After
-    public void stopDataFormatter() throws Exception
-    {
+
+    @AfterEach
+    public void afterEach() {
         dataFormatter.stop();
     }
-    
+
     @Override
     public boolean isUseRouteBuilder() {
         // each unit test include their own route builder
@@ -98,20 +97,18 @@ public class SmooksDataFormatTest extends CamelTestSupport
     }
 
     @Test
-    public void unmarshal() throws Exception
-    {
+    public void unmarshal() throws Exception {
         final UnmarshalProcessor unmarshalProcessor = new UnmarshalProcessor(dataFormatter);
         final DefaultExchange exchange = new DefaultExchange(camelContext);
         exchange.getIn().setBody(getCustomerInputStream(CUSTOMER_XML));
-        
+
         unmarshalProcessor.process(exchange);
-        
+
         assertEquals(Customer.class, exchange.getOut().getBody().getClass());
     }
-    
+
     @Test
-    public void marshal() throws Exception
-    {
+    public void marshal() throws Exception {
         final MarshalProcessor marshalProcessor = new MarshalProcessor(dataFormatter);
         final DefaultExchange exchange = new DefaultExchange(camelContext);
         final Customer customer = new Customer();
@@ -120,9 +117,9 @@ public class SmooksDataFormatTest extends CamelTestSupport
         customer.setGender(Gender.Male);
         customer.setAge(35);
         customer.setCountry("USA");
-        
+
         exchange.getIn().setBody(customer, JavaSource.class);
-        
+
         marshalProcessor.process(exchange);
 
         assertFalse(DiffBuilder.compare(getCustomerXml(CUSTOMER_XML_EXPECTED)).
@@ -132,22 +129,20 @@ public class SmooksDataFormatTest extends CamelTestSupport
                 build().
                 hasDifferences());
     }
-    
+
     @Test
-    public void unmarshalMarshalThroughCamel() throws Exception
-    {  
+    public void unmarshalMarshalThroughCamel() throws Exception {
         context.addRoutes(new RouteBuilder() {
             @Override
-            public void configure() throws Exception
-            {
+            public void configure() throws Exception {
                 from("direct:a")
-                .unmarshal(dataFormatter)
-                .marshal(dataFormatter);
+                        .unmarshal(dataFormatter)
+                        .marshal(dataFormatter);
             }
         });
-        
+
         context.start();
-        
+
         final Exchange exchange = template.request("direct:a", new Processor() {
             public void process(final Exchange exchange) throws Exception {
                 exchange.getIn().setBody(getCustomerInputStream(CUSTOMER_XML));
@@ -160,14 +155,12 @@ public class SmooksDataFormatTest extends CamelTestSupport
                 build().
                 hasDifferences());
     }
-    
-    private InputStream getCustomerInputStream(final String resource)
-    {
+
+    private InputStream getCustomerInputStream(final String resource) {
         return getClass().getResourceAsStream(resource);
     }
-    
-    private String getCustomerXml(final String resource) throws IOException
-    {
+
+    private String getCustomerXml(final String resource) throws IOException {
         return StreamUtils.readStream(new InputStreamReader(getCustomerInputStream(resource)));
     }
 

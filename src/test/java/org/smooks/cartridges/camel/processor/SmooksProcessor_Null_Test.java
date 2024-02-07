@@ -44,12 +44,13 @@ package org.smooks.cartridges.camel.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.payload.StringSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 
@@ -59,19 +60,15 @@ public class SmooksProcessor_Null_Test extends CamelTestSupport {
 
 	@Test
     public void test() throws Exception {
-        Exchange response = template.send("direct:blah", ExchangePattern.InOptionalOut, new Processor() {
-            public void process(Exchange exchange) throws Exception {
-                exchange.getIn().setBody(new StringSource("<x/>"));
-            }
-        });
-        assertFalse(response.hasOut());
+        Exchange response = template.send("direct:blah", ExchangePattern.InOut, exchange -> exchange.getIn().setBody(new StringSource("<x/>")));
+        assertEquals("<x/>", response.getMessage().getBody(String.class));
     }
 
 	/* (non-Javadoc)
 	 * @see org.apache.camel.test.junit4.CamelTestSupport#createRouteBuilder()
 	 */
 	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
+	protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() {
                 from("direct:blah").process(new SmooksProcessor(new Smooks(), context));

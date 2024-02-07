@@ -45,12 +45,14 @@ package org.smooks.cartridges.camel.processor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.payload.Exports;
 import org.smooks.io.payload.StringResult;
 import org.smooks.io.payload.StringSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 
@@ -60,11 +62,7 @@ public class SmooksProcessor_StringResult_Test extends CamelTestSupport {
 
 	@Test
     public void test() throws Exception {
-        template.request("direct:a", new Processor() {
-            public void process(Exchange exchange) throws Exception {
-                exchange.getIn().setBody(new StringSource("<x/>"));
-            }
-        });
+        template.request("direct:a", exchange -> exchange.getIn().setBody(new StringSource("<x/>")));
         
         assertEquals("<x/>", DirectBProcessor.inMessage);
     }
@@ -73,7 +71,7 @@ public class SmooksProcessor_StringResult_Test extends CamelTestSupport {
 	 * @see org.apache.camel.test.junit4.CamelTestSupport#createRouteBuilder()
 	 */
 	@Override
-	protected RouteBuilder createRouteBuilder() throws Exception {
+	protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() {
                 from("direct:a")
@@ -89,7 +87,7 @@ public class SmooksProcessor_StringResult_Test extends CamelTestSupport {
 
 		private static String inMessage;
 		
-		public void process(Exchange exchange) throws Exception {
+		public void process(Exchange exchange) {
 			inMessage = (String) exchange.getIn().getBody();
 		}		
 	}

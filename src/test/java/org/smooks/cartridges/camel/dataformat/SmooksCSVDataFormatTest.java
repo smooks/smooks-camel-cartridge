@@ -49,20 +49,24 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
 import org.smooks.io.payload.JavaSourceWithoutEventStream;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
+import static org.apache.camel.test.junit5.TestSupport.assertIsInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
  * Smooks CSV DataFormat unit test.
  */
 public class SmooksCSVDataFormatTest extends CamelTestSupport {
-	
+
     private static Customer charlesExpected;
     private static Customer chrisExpected;
 
@@ -71,50 +75,50 @@ public class SmooksCSVDataFormatTest extends CamelTestSupport {
 
     @EndpointInject(value = "direct:marshal")
     private Endpoint marshal;
-    
+
     @EndpointInject(value = "mock:result")
     private MockEndpoint result;
 
     @Test
     public void unmarshalCSV() throws Exception {
         result.expectedMessageCount(1);
-        
+
         template.send(unmarshal, new Processor() {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setBody("christian,mueller,Male,33,germany\n" +
-                		"charles,moulliard,Male,43,belgium\n");
+                        "charles,moulliard,Male,43,belgium\n");
             }
         });
 
-        assertMockEndpointsSatisfied();
+        assertIsSatisfied();
         Exchange exchange = result.assertExchangeReceived(0);
         assertIsInstanceOf(List.class, exchange.getIn().getBody());
         @SuppressWarnings("rawtypes")
-		List customerList = exchange.getIn().getBody(List.class);
+        List customerList = exchange.getIn().getBody(List.class);
         assertEquals(2, customerList.size());
-        
+
         Customer chrisActual = (Customer) customerList.get(0);
         assertEquals(chrisActual, chrisActual);
-        
+
         Customer charlesActual = (Customer) customerList.get(1);
         assertEquals(charlesExpected, charlesActual);
     }
-    
+
     @Test
     public void marshalCSV() throws Exception {
         result.expectedMessageCount(1);
-        
+
         final List<Customer> customerList = new ArrayList<Customer>();
         customerList.add(chrisExpected);
         customerList.add(charlesExpected);
-        
+
         template.send(marshal, new Processor() {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setBody(customerList);
             }
         });
 
-        assertMockEndpointsSatisfied();
+        assertIsSatisfied();
         Exchange exchange = result.assertExchangeReceived(0);
         assertEquals("christian,mueller,Male,33,germany\n" +
                 "charles,moulliard,Male,43,belgium\n", exchange.getIn().getBody(String.class));
@@ -126,32 +130,31 @@ public class SmooksCSVDataFormatTest extends CamelTestSupport {
                 SmooksDataFormat csvUnmarshal = new SmooksDataFormat("csv-smooks-unmarshal-config.xml");
 
                 from("direct:unmarshal")
-                .unmarshal(csvUnmarshal).convertBodyTo(List.class)
-                .to("mock:result");
-                
+                        .unmarshal(csvUnmarshal).convertBodyTo(List.class)
+                        .to("mock:result");
+
                 SmooksDataFormat csvMarshal = new SmooksDataFormat("csv-smooks-marshal-config.xml");
                 from("direct:marshal").convertBodyTo(JavaSourceWithoutEventStream.class)
-                .marshal(csvMarshal)
-                .to("mock:result");
+                        .marshal(csvMarshal)
+                        .to("mock:result");
             }
         };
     }
 
-	@BeforeClass
-	public static void createExcpectedCustomers()
-	{
-		charlesExpected = new Customer();
-		charlesExpected.setFirstName("charles");
-		charlesExpected.setLastName("moulliard");
-		charlesExpected.setAge(43);
-		charlesExpected.setGender(Gender.Male);
-		charlesExpected.setCountry("belgium");
-		
-		chrisExpected = new Customer();
-		chrisExpected.setFirstName("christian");
-		chrisExpected.setLastName("mueller");
-		chrisExpected.setAge(33);
-		chrisExpected.setGender(Gender.Male);
-		chrisExpected.setCountry("germany");
-	}
+    @BeforeAll
+    public static void beforeAll() {
+        charlesExpected = new Customer();
+        charlesExpected.setFirstName("charles");
+        charlesExpected.setLastName("moulliard");
+        charlesExpected.setAge(43);
+        charlesExpected.setGender(Gender.Male);
+        charlesExpected.setCountry("belgium");
+
+        chrisExpected = new Customer();
+        chrisExpected.setFirstName("christian");
+        chrisExpected.setLastName("mueller");
+        chrisExpected.setAge(33);
+        chrisExpected.setGender(Gender.Male);
+        chrisExpected.setCountry("germany");
+    }
 }
