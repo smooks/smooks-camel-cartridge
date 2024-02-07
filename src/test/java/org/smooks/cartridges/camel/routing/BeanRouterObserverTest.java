@@ -43,12 +43,11 @@
 package org.smooks.cartridges.camel.routing;
 
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.smooks.api.bean.lifecycle.BeanContextLifecycleEvent;
 import org.smooks.api.bean.lifecycle.BeanLifecycle;
-import org.smooks.api.bean.repository.BeanId;
 import org.smooks.engine.bean.repository.DefaultBeanId;
 import org.smooks.tck.MockExecutionContext;
 
@@ -57,24 +56,20 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit test for {@link BeanRouterObserver}
- * 
- * @author Daniel Bevenius
  *
+ * @author Daniel Bevenius
  */
-public class BeanRouterObserverTest extends CamelTestSupport
-{
+public class BeanRouterObserverTest extends CamelTestSupport {
     private static final String ENDPOINT_URI = "mock://beanRouterUnitTest";
     private MockEndpoint endpoint;
-    
-    @Before
-    public void setup() throws Exception
-    {
+
+    @BeforeEach
+    public void beforeEach() {
         endpoint = getMockEndpoint(ENDPOINT_URI);
     }
-    
-    @Test 
-    public void onBeanLifecycleEventCreated() throws Exception
-    {
+
+    @Test
+    public void onBeanLifecycleEventCreated() throws Exception {
         final String sampleBean = "testOrder";
         final String beanId = "orderId";
         final BeanRouter beanRouter = new BeanRouter(context);
@@ -86,16 +81,16 @@ public class BeanRouterObserverTest extends CamelTestSupport
         final BeanRouterObserver beanRouterObserver = new BeanRouterObserver(beanRouter, beanId);
         final MockExecutionContext smooksExecutionContext = new MockExecutionContext();
         final BeanContextLifecycleEvent event = mock(BeanContextLifecycleEvent.class);
-        
+
         when(event.getBeanId()).thenReturn(new DefaultBeanId(null, 0, beanId));
         when(event.getLifecycle()).thenReturn(BeanLifecycle.END_FRAGMENT);
         when(event.getBean()).thenReturn(sampleBean);
         when(event.getExecutionContext()).thenReturn(smooksExecutionContext);
-		
+
         endpoint.setExpectedMessageCount(1);
         beanRouterObserver.onBeanLifecycleEvent(event);
         endpoint.assertIsSatisfied();
         endpoint.expectedBodiesReceived(sampleBean);
     }
-    
+
 }

@@ -22,19 +22,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -42,6 +42,8 @@
  */
 package org.smooks.cartridges.camel.processor;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
@@ -50,28 +52,35 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spi.ManagementAgent;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.test.junit4.CamelTestSupport;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.smooks.support.StreamUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xmlunit.builder.DiffBuilder;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import java.io.*;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
+import static org.apache.camel.test.junit5.TestSupport.assertIsInstanceOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for {@link SmooksProcessor}.
- * 
+ *
  * @author Christian Mueller
  * @author Daniel Bevenius
  */
@@ -80,8 +89,8 @@ public class SmooksProcessorTest extends CamelTestSupport {
     private MockEndpoint result;
     private MBeanServer mbeanServer;
 
-    @Before
-    public void getMbeanServer() {
+    @BeforeEach
+    public void beforeEach() {
         ManagementAgent managementAgent = context.getManagementStrategy().getManagementAgent();
         mbeanServer = managementAgent.getMBeanServer();
     }
@@ -100,7 +109,7 @@ public class SmooksProcessorTest extends CamelTestSupport {
         result.expectedMessageCount(1);
         template.sendBody("direct://input", getOrderEdi());
 
-        assertMockEndpointsSatisfied();
+        assertIsSatisfied();
 
         Exchange exchange = result.assertExchangeReceived(0);
         assertIsInstanceOf(Document.class, exchange.getIn().getBody());
@@ -146,11 +155,11 @@ public class SmooksProcessorTest extends CamelTestSupport {
 
         File report = new File("target/smooks-report.html");
         report.deleteOnExit();
-        assertTrue("Smooks report was not generated.", report.exists());
+        assertTrue(report.exists(), "Smooks report was not generated.");
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void stopStartContext() throws Exception {
         ObjectInstance smooksProcessorMBean = getSmooksProcessorObjectInstance();
 

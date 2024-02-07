@@ -42,8 +42,6 @@
  */
 package org.smooks.cartridges.camel.converters;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.BufferedReader;
 import java.io.StringWriter;
 
@@ -51,40 +49,37 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.smooks.io.payload.StringResult;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link ResultConverter}.
- * 
- * @author Daniel Bevenius
  *
+ * @author Daniel Bevenius
  */
-public class ResultConverterTest
-{
+public class ResultConverterTest {
     private TypeConverter typeConverter;
 
-    @Before
-    public void getTypeConverter()
-    {
+    @BeforeEach
+    public void beforeEach() {
         DefaultCamelContext camelContext = new DefaultCamelContext();
         typeConverter = camelContext.getTypeConverter();
     }
-    
+
     @Test
-    public void convertStringResultToStreamSource() throws Exception
-    {
+    public void convertStringResultToStreamSource() throws Exception {
         StringResult stringResult = createStringResult("Bajja");
-        
+
         StreamSource streamSource = typeConverter.convertTo(StreamSource.class, stringResult);
-        
+
         BufferedReader reader = new BufferedReader(streamSource.getReader());
         assertEquals("Bajja", reader.readLine());
     }
-    
-    private StringResult createStringResult(final String string)
-    {
+
+    private StringResult createStringResult(final String string) {
         StringWriter stringWriter = new StringWriter();
         stringWriter.write(string);
         StringResult stringResult = new StringResult();
