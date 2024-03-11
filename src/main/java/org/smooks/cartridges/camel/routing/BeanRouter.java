@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -53,8 +53,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksConfigException;
 import org.smooks.api.SmooksException;
 import org.smooks.api.delivery.ordering.Consumer;
-import org.smooks.api.lifecycle.ExecutionLifecycleCleanable;
-import org.smooks.api.lifecycle.ExecutionLifecycleInitializable;
+import org.smooks.api.lifecycle.PostExecutionLifecycle;
+import org.smooks.api.lifecycle.PreExecutionLifecycle;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
 import org.smooks.assertion.AssertArgument;
@@ -69,42 +69,42 @@ import java.util.Optional;
 
 /**
  * Camel bean routing visitor.
- * 
+ *
  * @author <a href="mailto:tom.fennelly@gmail.com">tom.fennelly@gmail.com</a>
  * @author <a href="mailto:daniel.bevenius@gmail.com">daniel.bevenius@gmail.com</a>
  */
-public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleInitializable, ExecutionLifecycleCleanable {
-    
+public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle, PostExecutionLifecycle {
+
     @Inject
     private String beanId;
-    
+
     @Inject
     private String toEndpoint;
 
     @Inject
     private Optional<String> condition;
-    
+
     @Inject
     private Optional<String> correlationIdName;
 
     @Inject
     private Optional<FreeMarkerTemplate> correlationIdPattern;
-    
+
     @Inject
     private ApplicationContext applicationContext;
-    
+
     @Inject
     ResourceConfig resourceConfig;
 
     private ProducerTemplate producerTemplate;
     private BeanRouterObserver camelRouterObserable;
     private CamelContext camelContext;
-    
+
     public BeanRouter() {
     }
-    
+
     public BeanRouter(final CamelContext camelContext) {
-       this.camelContext = camelContext; 
+        this.camelContext = camelContext;
     }
 
     @PostConstruct
@@ -132,8 +132,7 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     /**
      * Set the beanId of the bean to be routed.
      *
-     * @param beanId
-     *            the beanId to set
+     * @param beanId the beanId to set
      * @return This router instance.
      */
     public BeanRouter setBeanId(final String beanId) {
@@ -144,8 +143,7 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     /**
      * Set the Camel endpoint to which the bean is to be routed.
      *
-     * @param toEndpoint
-     *            the toEndpoint to set
+     * @param toEndpoint the toEndpoint to set
      * @return This router instance.
      */
     public BeanRouter setToEndpoint(final String toEndpoint) {
@@ -183,26 +181,27 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
 
     /**
      * Send the bean to the target endpoint.
-     * @param bean The bean to be sent.
+     *
+     * @param bean        The bean to be sent.
      * @param execContext The execution context.
      */
     protected void sendBean(final Object bean, final ExecutionContext execContext) {
         try {
-            if(correlationIdPattern != null && correlationIdPattern.isPresent()) {
+            if (correlationIdPattern != null && correlationIdPattern.isPresent()) {
                 Processor processor = exchange -> {
                     Message in = exchange.getIn();
                     in.setBody(bean);
                     in.setHeader(correlationIdName.orElse(null), correlationIdPattern.get().apply(FreeMarkerUtils.getMergedModel(execContext)));
                 };
                 producerTemplate.send(toEndpoint, processor);
-            }else {
+            } else {
                 producerTemplate.sendBodyAndHeaders(toEndpoint, bean, execContext.getBeanContext().getBeanMap());
             }
-        }  catch (final Exception e) {
+        } catch (final Exception e) {
             throw new SmooksException("Exception routing beanId '" + beanId + "' to endpoint '" + toEndpoint + "'.", e);
         }
     }
-    
+
     private Object getBeanFromExecutionContext(final ExecutionContext execContext, final String beanId) {
         final Object bean = execContext.getBeanContext().getBean(beanId);
         if (bean == null) {
@@ -215,11 +214,11 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
 
     private CamelContext getCamelContext() {
         if (camelContext == null)
-	        return applicationContext.getRegistry().lookup(CamelContext.class);
+            return applicationContext.getRegistry().lookup(CamelContext.class);
         else
             return camelContext;
     }
-    
+
     private boolean isBeanRoutingConfigured() {
         return "none".equals(resourceConfig.getSelectorPath().getSelector());
     }
@@ -228,7 +227,7 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     public void preDestroy() {
         try {
             producerTemplate.stop();
-        }  catch (final Exception e) {
+        } catch (final Exception e) {
             throw new SmooksException(e.getMessage(), e);
         }
     }
@@ -239,17 +238,16 @@ public class BeanRouter implements AfterVisitor, Consumer, ExecutionLifecycleIni
     }
 
     @Override
-    public void executeExecutionLifecycleInitialize(final ExecutionContext executionContext) {
-        if (isBeanRoutingConfigured()) {
-            executionContext.getBeanContext().addObserver(camelRouterObserable);
-        }
-    }
-
-    @Override
-    public void executeExecutionLifecycleCleanup(ExecutionContext executionContext) {
+    public void onPostExecution(ExecutionContext executionContext) {
         if (isBeanRoutingConfigured()) {
             executionContext.getBeanContext().removeObserver(camelRouterObserable);
         }
     }
 
+    @Override
+    public void onPreExecution(ExecutionContext executionContext) {
+        if (isBeanRoutingConfigured()) {
+            executionContext.getBeanContext().addObserver(camelRouterObserable);
+        }
+    }
 }
