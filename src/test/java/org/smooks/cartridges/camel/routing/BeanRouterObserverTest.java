@@ -49,7 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.smooks.api.bean.lifecycle.BeanContextLifecycleEvent;
 import org.smooks.api.bean.lifecycle.BeanLifecycle;
 import org.smooks.engine.bean.repository.DefaultBeanId;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockExecutionContext;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
