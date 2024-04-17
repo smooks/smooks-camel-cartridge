@@ -41,7 +41,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <camel.version>4.4.0</camel.version>
+        <camel.version>4.5.0</camel.version>
         <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
