@@ -40,11 +40,13 @@ The above configuration shows routing using the `+beanId+` attribute. It is also
 
 == Apache Camel Integration
 
-Integrating Smooks from Apache Camel lets you to access all the features of Smooks from within Camel. You can take an existing Smooks configuration and use this in your Camel routes using one of the options that are described in this chapter.
+Integrating Smooks from Apache Camel lets you access all the features of Smooks from within Camel. You can take an existing Smooks configuration and use this in your Camel routes using one of the options that are described in this chapter.
 
 Using Smooks in Camel can be done in three ways:
 
 === SmooksComponent
+
+WARNING: SmooksComponent is deprecated and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
 
 The `+SmooksComponent+` is a Camel https://camel.apache.org/component.html[Component] which can used when  you want to process the Camel Message Body using Smooks. You can do this by adding a route in your Camel route configuration:
 
@@ -82,7 +84,9 @@ from("direct:unmarshal")
 
 === SmooksProcessor
 
-Using `+SmooksProcessor+` gives you full control over Smooks, for example if you want to programatically create the underlying Smooks instance you’d use `+SmooksProcessor+`. When using `+SmooksProcessor+`, you can pass a Smooks instance to its constructor and prior to that programmatically configure Smooks.
+WARNING: SmooksProcessor is deprecated and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
+
+Using `+SmooksProcessor+` gives you full control over Smooks, for example if you want to programmatically create the underlying Smooks instance you’d use `+SmooksProcessor+`. When using `+SmooksProcessor+`, you can pass a Smooks instance to its constructor and prior to that programmatically configure Smooks.
 
 Below is an example of using the `+SmooksProcessor+` in a Camel route:
 
@@ -112,7 +116,7 @@ from("file://input?noop=true")
 .to("mock:result");
 ----
 
-TIP: See the https://github.com/smooks/smooks-examples/tree/v1.0.5/camel[Apache Camel examples] in the examples page.
+TIP: See the https://github.com/smooks/smooks-examples/tree/v2/camel[Apache Camel examples] in the examples page.
 
 == Maven Coordinates
 

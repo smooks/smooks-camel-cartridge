@@ -61,6 +61,7 @@ import java.util.Map;
  * @author Christian Mueller
  * @author Daniel Bevenius
  */
+@Deprecated(forRemoval = true, since = "2.0.0-RC5")
 public class SmooksComponent extends DefaultComponent {
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         SmooksProcessor smooksProcessor = new SmooksProcessor(remaining, getCamelContext());

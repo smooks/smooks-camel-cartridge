@@ -65,6 +65,7 @@ import java.util.Set;
  * @author Daniel Bevenius
  */
 @Converter(generateLoader = true)
+@Deprecated(forRemoval = true, since = "2.0.0-RC5")
 public class ResultConverter {
     public static final String SMOOKS_RESULT_KEY = "SmooksResultKeys";
 

@@ -60,6 +60,7 @@ import java.io.InputStream;
  * @author Daniel Bevenius
  */
 @Converter(generateLoader = true)
+@Deprecated(forRemoval = true, since = "2.0.0-RC5")
 public class SourceConverter {
     private SourceConverter() {
     }
