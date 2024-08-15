@@ -56,17 +56,18 @@ import org.smooks.cartridges.camel.processor.SmooksProcessor;
  *
  * @author Daniel Bevenius
  */
+@Deprecated(forRemoval = true, since = "2.0.0-RC5")
 public class SmooksEndpoint extends ProcessorEndpoint implements Service {
-    private final SmooksProcessor smooksProcesor;
+    private final SmooksProcessor smooksProcessor;
 
     public SmooksEndpoint(String endpointUri, Component component, SmooksProcessor processor) {
         super(endpointUri, component, processor);
-        this.smooksProcesor = processor;
+        this.smooksProcessor = processor;
     }
 
     public void start() {
         try {
-            smooksProcesor.start();
+            smooksProcessor.start();
         } catch (Exception e) {
             throw new SmooksException(e.getMessage(), e);
         }
@@ -74,7 +75,7 @@ public class SmooksEndpoint extends ProcessorEndpoint implements Service {
 
     public void stop() {
         try {
-            smooksProcesor.stop();
+            smooksProcessor.stop();
         } catch (Exception e) {
             throw new SmooksException(e.getMessage(), e);
         }
