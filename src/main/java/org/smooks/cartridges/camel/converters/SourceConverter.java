@@ -44,14 +44,21 @@ package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
 import org.apache.camel.component.file.GenericFile;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.JavaSource;
-import org.smooks.io.payload.JavaSourceWithoutEventStream;
+import org.smooks.api.SmooksException;
+import org.smooks.api.io.Source;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.JavaSource;
+import org.smooks.io.source.JavaSourceWithoutEventStream;
+import org.smooks.io.source.ReaderSource;
+import org.smooks.io.source.StreamSource;
+import org.smooks.io.source.StringSource;
+import org.smooks.io.source.URLSource;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.InputStream;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * SourceConverter is a Camel {@link Converter} that converts from different
@@ -77,17 +84,31 @@ public class SourceConverter {
 
     @Converter
     public static Source toStreamSource(InputStream in) {
-        return new StreamSource(in);
+        return new StreamSource<>(in);
     }
 
     @Converter
-    public static JavaSource toJavaSource(JavaResult result) {
+    public static Source toReaderSource(Reader reader) {
+        return new ReaderSource<>(reader);
+    }
+
+    @Converter
+    public static JavaSource toJavaSource(JavaSink result) {
         return new JavaSource(result.getResultMap().values());
     }
 
     @Converter
-    public static Source toStreamSource(GenericFile<File> genericFile) {
-        return new StreamSource((File) genericFile.getBody());
+    public static Source toStringSource(String string) {
+        return new StringSource(string);
     }
 
+    @Converter
+    public static Source toURISource(GenericFile<File> genericFile) {
+        String systemId = new javax.xml.transform.stream.StreamSource((File) genericFile.getBody()).getSystemId();
+        try {
+            return new URLSource(new URL(systemId));
+        } catch (MalformedURLException e) {
+            throw new SmooksException(e);
+        }
+    }
 }

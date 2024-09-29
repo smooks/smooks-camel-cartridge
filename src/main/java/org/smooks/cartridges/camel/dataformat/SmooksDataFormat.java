@@ -50,16 +50,16 @@ import org.smooks.Smooks;
 import org.smooks.SmooksFactory;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
+import org.smooks.api.io.Sink;
 import org.smooks.cartridges.camel.component.SmooksComponent;
 import org.smooks.cartridges.camel.processor.SmooksProcessor;
 import org.smooks.engine.lookup.ExportsLookup;
 import org.smooks.io.payload.Exports;
-import org.smooks.io.payload.JavaSource;
-import org.smooks.io.payload.StringResult;
+import org.smooks.io.sink.StringSink;
+import org.smooks.io.source.JavaSource;
+import org.smooks.io.source.StreamSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -108,10 +108,10 @@ public class SmooksDataFormat implements DataFormat, CamelContextAware, Service 
         final ExecutionContext execContext = smooks.createExecutionContext();
         final TypeConverter typeConverter = exchange.getContext().getTypeConverter();
         final JavaSource source = typeConverter.mandatoryConvertTo(JavaSource.class, exchange, fromBody);
-        final StringResult stringResult = new StringResult();
-        smooks.filterSource(execContext, source, stringResult);
+        final StringSink stringSink = new StringSink();
+        smooks.filterSource(execContext, source, stringSink);
 
-        toStream.write(stringResult.getResult().getBytes(execContext.getContentEncoding()));
+        toStream.write(stringSink.getResult().getBytes(execContext.getContentEncoding()));
     }
 
     /**
@@ -126,13 +126,13 @@ public class SmooksDataFormat implements DataFormat, CamelContextAware, Service 
     public Object unmarshal(final Exchange exchange, final InputStream fromStream) {
         final ExecutionContext execContext = smooks.createExecutionContext();
         final Exports exports = smooks.getApplicationContext().getRegistry().lookup(new ExportsLookup());
-        final Result[] results = exports.createResults();
-        smooks.filterSource(execContext, new StreamSource(fromStream), results);
-        return getResult(exports, results, exchange);
+        final Sink[] sinks = exports.createSinks();
+        smooks.filterSource(execContext, new StreamSource(fromStream), sinks);
+        return getResult(exports, sinks, exchange);
     }
 
-    protected Object getResult(final Exports exports, final Result[] results, final Exchange exchange) {
-        final List<Object> objects = Exports.extractResults(results, exports);
+    protected Object getResult(final Exports exports, final Sink[] sinks, final Exchange exchange) {
+        final List<Object> objects = Exports.extractSinks(sinks, exports);
         if (objects.size() == 1) {
             return objects.get(0);
         } else {

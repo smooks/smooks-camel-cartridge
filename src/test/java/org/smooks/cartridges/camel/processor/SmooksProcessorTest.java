@@ -64,7 +64,12 @@ import org.xmlunit.builder.DiffBuilder;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.Set;
 
 import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
@@ -122,7 +127,7 @@ public class SmooksProcessorTest extends CamelTestSupport {
 
     @Test
     public void processWithAttachment() throws CamelExecutionException, IOException {
-        final DefaultExchange exchange = new DefaultExchange(context);
+        final Exchange exchange = new DefaultExchange(context);
         final String attachmentContent = "A dummy attachment";
         final String attachmentId = "testAttachment";
         addAttachment(attachmentContent, attachmentId, exchange);

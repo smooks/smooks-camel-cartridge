@@ -76,29 +76,29 @@ import java.util.Optional;
 public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle, PostExecutionLifecycle {
 
     @Inject
-    private String beanId;
+    protected String beanId;
 
     @Inject
-    private String toEndpoint;
+    protected String toEndpoint;
 
     @Inject
-    private Optional<String> condition;
+    protected Optional<String> condition;
 
     @Inject
-    private Optional<String> correlationIdName;
+    protected Optional<String> correlationIdName;
 
     @Inject
-    private Optional<FreeMarkerTemplate> correlationIdPattern;
+    protected Optional<FreeMarkerTemplate> correlationIdPattern;
 
     @Inject
-    private ApplicationContext applicationContext;
+    protected ApplicationContext applicationContext;
 
     @Inject
-    ResourceConfig resourceConfig;
+    protected ResourceConfig resourceConfig;
 
-    private ProducerTemplate producerTemplate;
-    private BeanRouterObserver camelRouterObserable;
-    private CamelContext camelContext;
+    protected ProducerTemplate producerTemplate;
+    protected BeanRouterObserver camelRouterObserable;
+    protected CamelContext camelContext;
 
     public BeanRouter() {
     }
@@ -121,10 +121,10 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
             }
         }
 
-        if ((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || !correlationIdPattern.isPresent())) {
+        if ((correlationIdName != null && correlationIdName.isPresent()) && (correlationIdPattern == null || correlationIdPattern.isEmpty())) {
             throw new SmooksConfigException("Camel router component configured with a 'correlationIdName', but 'correlationIdPattern' is not configured.");
         }
-        if ((correlationIdName == null || !correlationIdName.isPresent()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
+        if ((correlationIdName == null || correlationIdName.isEmpty()) && (correlationIdPattern != null && correlationIdPattern.isPresent())) {
             throw new SmooksConfigException("Camel router component configured with a 'correlationIdPattern', but 'correlationIdName' is not configured.");
         }
     }
@@ -213,10 +213,11 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
     }
 
     private CamelContext getCamelContext() {
-        if (camelContext == null)
+        if (camelContext == null) {
             return applicationContext.getRegistry().lookup(CamelContext.class);
-        else
+        } else {
             return camelContext;
+        }
     }
 
     private boolean isBeanRoutingConfigured() {

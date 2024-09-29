@@ -54,7 +54,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
-import org.smooks.io.payload.JavaSource;
+import org.smooks.io.source.JavaSource;
 import org.smooks.support.StreamUtils;
 import org.xmlunit.builder.DiffBuilder;
 

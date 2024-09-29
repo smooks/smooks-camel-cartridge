@@ -51,7 +51,7 @@
 	</csv:reader>
 	
     <core:exports>
-        <core:result type="org.smooks.io.payload.JavaResult" extract="result"/>
+        <core:result type="org.smooks.io.sink.JavaSink" extract="result"/>
     </core:exports>
 	
 </smooks-resource-list>

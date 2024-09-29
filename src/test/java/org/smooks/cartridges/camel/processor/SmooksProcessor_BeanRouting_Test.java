@@ -52,7 +52,7 @@ import org.smooks.Smooks;
 import org.smooks.cartridges.camel.Coordinate;
 import org.smooks.cartridges.camel.routing.BeanRouter;
 import org.smooks.cartridges.javabean.Bean;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 
 import java.util.ArrayList;
 import java.util.List;

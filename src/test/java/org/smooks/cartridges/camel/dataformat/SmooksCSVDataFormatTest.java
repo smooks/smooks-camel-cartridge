@@ -53,7 +53,7 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.camel.dataformat.gender.Gender;
-import org.smooks.io.payload.JavaSourceWithoutEventStream;
+import org.smooks.io.source.JavaSourceWithoutEventStream;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +124,7 @@ public class SmooksCSVDataFormatTest extends CamelTestSupport {
                 "charles,moulliard,Male,43,belgium\n", exchange.getIn().getBody(String.class));
     }
 
-    protected RouteBuilder createRouteBuilder() throws Exception {
+    protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             public void configure() throws Exception {
                 SmooksDataFormat csvUnmarshal = new SmooksDataFormat("csv-smooks-unmarshal-config.xml");
