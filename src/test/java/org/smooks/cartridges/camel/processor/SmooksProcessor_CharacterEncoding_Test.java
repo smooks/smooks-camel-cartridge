@@ -44,8 +44,6 @@ package org.smooks.cartridges.camel.processor;
 
 import java.io.InputStream;
 
-import javax.xml.transform.stream.StreamSource;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -54,7 +52,8 @@ import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Value;
 import org.smooks.io.payload.Exports;
-import org.smooks.io.payload.JavaResult;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StreamSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -75,7 +74,7 @@ public class SmooksProcessor_CharacterEncoding_Test extends CamelTestSupport {
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() {
-                Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+                Smooks smooks = new Smooks().setExports(new Exports(JavaSink.class));
                 from("direct:a")
                         .process(new SmooksProcessor(smooks, context)
                                 .addVisitor(new Value("customer", "/order/header/customer", String.class, smooks.getApplicationContext().getRegistry())));
@@ -87,7 +86,7 @@ public class SmooksProcessor_CharacterEncoding_Test extends CamelTestSupport {
         Exchange response = template.request("direct:a", new Processor() {
             public void process(Exchange exchange) {
                 InputStream in = this.getClass().getResourceAsStream("/EBCDIC-input-message");
-                exchange.getIn().setBody(new StreamSource(in));
+                exchange.getIn().setBody(new StreamSource<>(in));
                 exchange.setProperty("CamelCharsetName", "Cp1047");
             }
         });

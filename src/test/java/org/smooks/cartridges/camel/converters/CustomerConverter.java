@@ -43,11 +43,11 @@
 package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
+import org.smooks.api.io.Source;
 import org.smooks.cartridges.camel.dataformat.Customer;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.JavaSource;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.JavaSource;
 
-import javax.xml.transform.Source;
 import java.util.Map;
 
 /**
@@ -63,13 +63,13 @@ public class CustomerConverter {
     }
 
     @Converter
-    public static Customer toCoordinate(JavaResult result) {
-        Object singleObject = getSingleObjectFromJavaResult(result);
+    public static Customer toCoordinate(JavaSink sink) {
+        Object singleObject = getSingleObjectFromJavaResult(sink);
         return (Customer) singleObject;
     }
 
-    private static Object getSingleObjectFromJavaResult(JavaResult result) {
-        Map<String, Object> resultMap = result.getResultMap();
+    private static Object getSingleObjectFromJavaResult(JavaSink sink) {
+        Map<String, Object> resultMap = sink.getResultMap();
         if (resultMap.size() == 1) {
             return resultMap.values().iterator().next();
         }
@@ -77,8 +77,7 @@ public class CustomerConverter {
     }
 
     @Converter
-    public static Source getSource(final Customer customer) {
-        JavaSource javaSource = new JavaSource(customer);
-        return javaSource;
+    public static Source getSource(Customer customer) {
+        return new JavaSource(customer);
     }
 }

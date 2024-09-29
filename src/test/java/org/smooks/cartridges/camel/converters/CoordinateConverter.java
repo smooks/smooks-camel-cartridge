@@ -44,7 +44,7 @@ package org.smooks.cartridges.camel.converters;
 
 import org.apache.camel.Converter;
 import org.smooks.cartridges.camel.Coordinate;
-import org.smooks.io.payload.JavaResult;
+import org.smooks.io.sink.JavaSink;
 
 import java.util.Map;
 
@@ -61,13 +61,13 @@ public class CoordinateConverter {
     }
 
     @Converter
-    public static Coordinate toCoordinate(JavaResult result) {
-        Object singleObject = getSingleObjectFromJavaResult(result);
+    public static Coordinate toCoordinate(JavaSink sink) {
+        Object singleObject = getSingleObjectFromJavaResult(sink);
         return (Coordinate) singleObject;
     }
 
-    private static Object getSingleObjectFromJavaResult(JavaResult result) {
-        Map<String, Object> resultMap = result.getResultMap();
+    private static Object getSingleObjectFromJavaResult(JavaSink sink) {
+        Map<String, Object> resultMap = sink.getResultMap();
         if (resultMap.size() == 1) {
             return resultMap.values().iterator().next();
         }

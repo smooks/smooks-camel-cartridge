@@ -48,7 +48,7 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.payload.Exports;
-import org.smooks.io.payload.StringResult;
+import org.smooks.io.sink.StringSink;
 
 import static org.apache.camel.component.mock.MockEndpoint.assertIsSatisfied;
 import static org.apache.camel.test.junit5.TestSupport.deleteDirectory;
@@ -81,7 +81,7 @@ public class SmooksProcessor_File_In_StringResult_Test extends CamelTestSupport 
         return new RouteBuilder() {
             public void configure() {
                 from("file://target/smooks").
-                        process(new SmooksProcessor(new Smooks().setExports(new Exports(StringResult.class)), context)).
+                        process(new SmooksProcessor(new Smooks().setExports(new Exports(StringSink.class)), context)).
                         to("mock:a");
             }
         };

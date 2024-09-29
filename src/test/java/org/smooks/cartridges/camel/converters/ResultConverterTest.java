@@ -43,20 +43,19 @@
 package org.smooks.cartridges.camel.converters;
 
 import java.io.BufferedReader;
-import java.io.StringWriter;
 
-import javax.xml.transform.stream.StreamSource;
-
+import org.apache.camel.CamelContext;
 import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.smooks.io.payload.StringResult;
+import org.smooks.io.sink.StringSink;
+import org.smooks.io.source.ReaderSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Unit test for {@link ResultConverter}.
+ * Unit test for {@link SinkConverter}.
  *
  * @author Daniel Bevenius
  */
@@ -65,26 +64,24 @@ public class ResultConverterTest {
 
     @BeforeEach
     public void beforeEach() {
-        DefaultCamelContext camelContext = new DefaultCamelContext();
+        CamelContext camelContext = new DefaultCamelContext();
         typeConverter = camelContext.getTypeConverter();
     }
 
     @Test
-    public void convertStringResultToStreamSource() throws Exception {
-        StringResult stringResult = createStringResult("Bajja");
+    public void convertStringSinkToReaderSource() throws Exception {
+        StringSink writerSink = createStringSink("Bajja");
 
-        StreamSource streamSource = typeConverter.convertTo(StreamSource.class, stringResult);
+        ReaderSource<?> streamSource = typeConverter.convertTo(ReaderSource.class, writerSink);
 
         BufferedReader reader = new BufferedReader(streamSource.getReader());
         assertEquals("Bajja", reader.readLine());
     }
 
-    private StringResult createStringResult(final String string) {
-        StringWriter stringWriter = new StringWriter();
-        stringWriter.write(string);
-        StringResult stringResult = new StringResult();
-        stringResult.setWriter(stringWriter);
-        return stringResult;
+    private StringSink createStringSink(final String string) {
+        StringSink writerSink = new StringSink();
+        writerSink.getStringWriter().write(string);
+        return writerSink;
     }
 
 }

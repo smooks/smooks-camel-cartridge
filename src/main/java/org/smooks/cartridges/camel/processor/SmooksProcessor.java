@@ -42,7 +42,13 @@
  */
 package org.smooks.cartridges.camel.processor;
 
-import org.apache.camel.*;
+import org.apache.camel.CamelContext;
+import org.apache.camel.CamelContextAware;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import org.apache.camel.Processor;
+import org.apache.camel.Service;
+import org.apache.camel.WrappedFile;
 import org.apache.camel.attachment.Attachment;
 import org.apache.camel.attachment.AttachmentMessage;
 import org.slf4j.Logger;
@@ -53,24 +59,35 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.delivery.VisitorAppender;
+import org.smooks.api.io.Sink;
+import org.smooks.api.io.Source;
 import org.smooks.api.resource.visitor.Visitor;
 import org.smooks.engine.lookup.ExportsLookup;
 import org.smooks.engine.report.HtmlReportGenerator;
 import org.smooks.io.payload.Exports;
+import org.smooks.io.source.DOMSource;
+import org.smooks.io.source.ReaderSource;
+import org.smooks.io.source.StreamSource;
+import org.smooks.io.source.URLSource;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Smooks {@link Processor} for Camel.
@@ -133,19 +150,19 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
 
         final Exports exports = smooks.getApplicationContext().getRegistry().lookup(new ExportsLookup());
         if (exports.hasExports()) {
-            final Result[] results = exports.createResults();
-            smooks.filterSource(executionContext, getSource(exchange), results);
-            setResultOnBody(exports, results, exchange);
+            final Sink[] sinks = exports.createSinks();
+            smooks.filterSource(executionContext, getSource(exchange, executionContext), sinks);
+            setResultOnBody(exports, sinks, exchange);
         } else {
-            smooks.filterSource(executionContext, getSource(exchange));
+            smooks.filterSource(executionContext, getSource(exchange, executionContext));
         }
 
         executionContext.remove(EXCHANGE_TYPED_KEY);
     }
 
-    protected void setResultOnBody(final Exports exports, final Result[] results, final Exchange exchange) {
+    protected void setResultOnBody(final Exports exports, final Sink[] sinks, final Exchange exchange) {
         final Message message = exchange.getMessage();
-        final List<Object> objects = Exports.extractResults(results, exports);
+        final List<Object> objects = Exports.extractSinks(sinks, exports);
         if (objects.size() == 1) {
             Object value = objects.get(0);
             message.setBody(value);
@@ -164,12 +181,11 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
         }
     }
 
-    private Source getSource(final Exchange exchange) {
+    private Source getSource(Exchange exchange, ExecutionContext executionContext) {
         Object payload = exchange.getIn().getBody();
 
-
         if (payload instanceof SAXSource) {
-            return new StreamSource((Reader) ((SAXSource) payload).getXMLReader());
+            return new ReaderSource<>((Reader) ((SAXSource) payload).getXMLReader());
         }
 
         if (payload instanceof Source) {
@@ -181,15 +197,20 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
         }
 
         if (payload instanceof InputStream) {
-            return new StreamSource((InputStream) payload);
+            return new StreamSource<>((InputStream) payload);
         }
 
         if (payload instanceof Reader) {
-            return new StreamSource((Reader) payload);
+            return new ReaderSource<>((Reader) payload);
         }
 
         if (payload instanceof WrappedFile) {
-            return new StreamSource((File) exchange.getIn().getBody(WrappedFile.class).getFile());
+            String systemId = new javax.xml.transform.stream.StreamSource((File) exchange.getIn().getBody(WrappedFile.class).getFile()).getSystemId();
+            try {
+                return new URLSource(new URL(systemId));
+            } catch (MalformedURLException e) {
+                throw new SmooksException(e);
+            }
         }
 
         return exchange.getIn().getBody(Source.class);
@@ -199,7 +220,7 @@ public class SmooksProcessor implements Processor, Service, CamelContextAware {
         return configUri;
     }
 
-    public void setSmooksConfig(final String smooksConfig) {
+    public void setSmooksConfig(String smooksConfig) {
         this.configUri = smooksConfig;
     }
 

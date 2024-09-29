@@ -49,8 +49,8 @@ import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.payload.Exports;
-import org.smooks.io.payload.StringResult;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.sink.StringSink;
+import org.smooks.io.source.StringSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -74,7 +74,7 @@ public class SmooksProcessor_StringResult_Test extends CamelTestSupport {
         return new RouteBuilder() {
             public void configure() {
                 from("direct:a")
-                        .process(new SmooksProcessor(new Smooks().setExports(new Exports(StringResult.class)), context))
+                        .process(new SmooksProcessor(new Smooks().setExports(new Exports(StringSink.class)), context))
                         .to("direct:b");
 
                 from("direct:b").convertBodyTo(String.class).process(new DirectBProcessor());

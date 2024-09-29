@@ -48,7 +48,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
-import org.smooks.io.payload.StringSource;
+import org.smooks.io.source.StringSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

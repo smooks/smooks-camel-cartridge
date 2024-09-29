@@ -51,9 +51,9 @@ import org.smooks.Smooks;
 import org.smooks.cartridges.javabean.Bean;
 import org.smooks.cartridges.javabean.Value;
 import org.smooks.io.payload.Exports;
-import org.smooks.io.payload.JavaResult;
-import org.smooks.io.payload.StringSource;
 import org.smooks.cartridges.camel.Coordinate;
+import org.smooks.io.sink.JavaSink;
+import org.smooks.io.source.StringSource;
 
 import java.util.Map;
 
@@ -72,7 +72,7 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 
     @Test
     public void test_single_value() throws Exception {
-        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        Smooks smooks = new Smooks().setExports(new Exports(JavaSink.class));
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() {
@@ -90,7 +90,7 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 
     @Test
     public void test_multi_value() throws Exception {
-        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        Smooks smooks = new Smooks().setExports(new Exports(JavaSink.class));
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -114,7 +114,7 @@ public class SmooksProcessor_JavaResult_Test extends CamelTestSupport {
 
     @Test
     public void test_bean() throws Exception {
-        Smooks smooks = new Smooks().setExports(new Exports(JavaResult.class));
+        Smooks smooks = new Smooks().setExports(new Exports(JavaSink.class));
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
