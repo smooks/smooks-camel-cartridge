@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Daniel Bevenius
  */
-public class ResultConverterTest {
+public class SinkConverterTest {
     private TypeConverter typeConverter;
 
     @BeforeEach
