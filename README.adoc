@@ -57,7 +57,7 @@ from("file://inputDir?noop=true")
 .to("jms:queue:order")
 ----
 
-The Smooks Component is configured with a mandatory configuration file, which is _smooks-config-xml_ in the example above. By just looking at the above route definition it is not clear what type of output that the SmooksComponent is producing. This is actually expressed in the Smooks configuration using the https://www.smooks.org/v2/documentation/#exporting_results[exports] element.
+The Smooks Component is configured with a mandatory configuration file, which is _smooks-config-xml_ in the example above. By just looking at the above route definition it is not clear what type of output that the SmooksComponent is producing. This is actually expressed in the Smooks configuration using the https://www.smooks.org/documentation/#exporting_results[exports] element.
 
 If you prefer/require programmatic configuration of Smooks you can use the link:#smooksprocessor[`+SmooksProcessor+`] to achieve this.
 
@@ -102,7 +102,7 @@ from("file://input?noop=true")
 .to("mock:result");
 ----
 
-Similar to the `+SmooksComponent+` we have not specified the result type that Smooks produces (if any that is). Instead this is expressed in the Smooks configuration using the https://www.smooks.org/v2/documentation/#exporting_results[exports] element, or you can do the same programmatically like this:
+Similar to the `+SmooksComponent+` we have not specified the result type that Smooks produces (if any that is). Instead this is expressed in the Smooks configuration using the https://www.smooks.org/documentation/#exporting_results[exports] element, or you can do the same programmatically like this:
 
 [source,java]
 ----
@@ -126,7 +126,7 @@ TIP: See the https://github.com/smooks/smooks-examples/tree/v2/camel[Apache Came
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-camel-cartridge</artifactId>
-    <version>2.0.0-RC4</version>
+    <version>2.0.0</version>
 </dependency>
 ----
 // end::smooks-camel-cartridge[]
