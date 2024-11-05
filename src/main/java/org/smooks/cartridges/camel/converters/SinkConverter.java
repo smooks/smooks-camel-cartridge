@@ -63,7 +63,7 @@ import java.util.Set;
  * @author Daniel Bevenius
  */
 @Converter(generateLoader = true)
-@Deprecated(forRemoval = true, since = "2.0.0-RC5")
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class SinkConverter {
     public static final String SMOOKS_RESULT_KEY = "SmooksResultKeys";
 

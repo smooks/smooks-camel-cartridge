@@ -56,7 +56,7 @@ import org.smooks.cartridges.camel.processor.SmooksProcessor;
  *
  * @author Daniel Bevenius
  */
-@Deprecated(forRemoval = true, since = "2.0.0-RC5")
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class SmooksEndpoint extends ProcessorEndpoint implements Service {
     private final SmooksProcessor smooksProcessor;
 

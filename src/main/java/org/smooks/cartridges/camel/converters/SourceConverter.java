@@ -67,7 +67,7 @@ import java.net.URL;
  * @author Daniel Bevenius
  */
 @Converter(generateLoader = true)
-@Deprecated(forRemoval = true, since = "2.0.0-RC5")
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class SourceConverter {
     private SourceConverter() {
     }
