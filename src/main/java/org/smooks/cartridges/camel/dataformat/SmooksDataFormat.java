@@ -83,6 +83,7 @@ import java.util.List;
  * @author Christian Mueller
  * @author Daniel Bevenius
  */
+@Deprecated(forRemoval = true, since = "3.0.0")
 public class SmooksDataFormat implements DataFormat, CamelContextAware, Service {
     private Smooks smooks;
     private CamelContext camelContext;

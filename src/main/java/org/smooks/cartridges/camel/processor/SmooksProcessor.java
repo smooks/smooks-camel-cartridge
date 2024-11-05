@@ -95,7 +95,7 @@ import java.util.Set;
  * @author Christian Mueller
  * @author Daniel Bevenius
  */
-@Deprecated(forRemoval = true, since = "2.0.0-RC5")
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class SmooksProcessor implements Processor, Service, CamelContextAware {
     public static final String SMOOKS_EXECUTION_CONTEXT = "CamelSmooksExecutionContext";
     public static final String CAMEL_CHARACTER_ENCODING = "CamelCharsetName";
