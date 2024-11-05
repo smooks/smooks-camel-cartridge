@@ -54,7 +54,6 @@ import org.smooks.api.SmooksException;
 import org.smooks.api.bean.context.BeanContext;
 import org.smooks.api.bean.lifecycle.BeanLifecycle;
 import org.smooks.api.resource.config.ResourceConfig;
-import org.smooks.cartridges.camel.processor.SmooksProcessor;
 import org.smooks.engine.bean.lifecycle.DefaultBeanContextLifecycleEvent;
 import org.smooks.engine.injector.Scope;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
@@ -64,6 +63,7 @@ import org.smooks.testkit.MockApplicationContext;
 
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,7 +76,7 @@ import static org.mockito.Mockito.when;
 public class BeanRouterTest extends CamelTestSupport {
     private static final String END_POINT_URI = "mock://beanRouterUnitTest";
     private static final String BEAN_ID = "testBeanId";
-    private static final String HEADER_ID = "testHeaderId";
+    private static final String HEADER_ID = "CamelSmooksExecutionContext";
 
     private ExecutionContext smooksExecutionContext;
     private MockEndpoint endpoint;
@@ -92,48 +92,49 @@ public class BeanRouterTest extends CamelTestSupport {
     }
 
     @Test
-    public void visitAfterWithMissingBeanInSmookBeanContext() throws SmooksException {
+    public void testVisitAfterWithMissingBeanInSmookBeanContext() throws SmooksException {
         when(beanContext.getBean(BEAN_ID)).thenReturn(null);
         assertThrows(SmooksException.class, () -> createBeanRouter(BEAN_ID, END_POINT_URI).visitAfter(null, smooksExecutionContext));
     }
 
     @Test
-    public void routeUsingOnlyBeanId() throws Exception {
+    public void testBeanRouterUsingOnlyBeanId() throws Exception {
         endpoint.setExpectedMessageCount(1);
         endpoint.expectedBodiesReceived(myBean);
 
-        final Smooks smooks = new Smooks();
-        final ExecutionContext execContext = smooks.createExecutionContext();
+        Smooks smooks = new Smooks();
+        ExecutionContext executionContext = smooks.createExecutionContext();
 
         BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
-        beanRouter.onPreExecution(execContext);
-        execContext.getBeanContext().addBean(BEAN_ID, myBean);
+        beanRouter.onPreExecution(executionContext);
+        executionContext.getBeanContext().addBean(BEAN_ID, myBean);
 
         // Force an END event
-        execContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(execContext,
-                null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
+        executionContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(executionContext,
+                null, BeanLifecycle.END_FRAGMENT, executionContext.getBeanContext().getBeanId(BEAN_ID), myBean));
 
         endpoint.assertIsSatisfied();
     }
 
     @Test
-    public void routeBeanWithHeaders() throws Exception {
-        endpoint.setExpectedMessageCount(1);
-        endpoint.expectedHeaderReceived(HEADER_ID, myBean);
+    public void testBeanRouterAddsCamelSmooksExecutionContextHeader() throws Exception {
+        Smooks smooks = new Smooks();
+        ExecutionContext executionContext = smooks.createExecutionContext();
 
-        final Smooks smooks = new Smooks();
-        final ExecutionContext execContext = smooks.createExecutionContext();
+        endpoint.setExpectedMessageCount(1);
+        endpoint.expectedHeaderReceived(HEADER_ID, executionContext);
+
 
         BeanRouter beanRouter = createBeanRouter(null, BEAN_ID, END_POINT_URI);
-        beanRouter.onPreExecution(execContext);
-        execContext.getBeanContext().addBean(BEAN_ID, myBean);
-        execContext.getBeanContext().addBean(HEADER_ID, myBean);
+        beanRouter.onPreExecution(executionContext);
+        executionContext.getBeanContext().addBean(BEAN_ID, myBean);
 
         // Force an END event
-        execContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(execContext,
-                null, BeanLifecycle.END_FRAGMENT, execContext.getBeanContext().getBeanId(BEAN_ID), myBean));
+        executionContext.getBeanContext().notifyObservers(new DefaultBeanContextLifecycleEvent(executionContext,
+                null, BeanLifecycle.END_FRAGMENT, executionContext.getBeanContext().getBeanId(BEAN_ID), myBean));
 
         endpoint.assertIsSatisfied();
+        assertNotNull(endpoint.getReceivedExchanges().get(0).getMessage().getHeader("CamelSmooksExecutionContext", ExecutionContext.class).getBeanContext().getBean(BEAN_ID));
     }
 
     @BeforeEach
@@ -143,7 +144,6 @@ public class BeanRouterTest extends CamelTestSupport {
         BeanContext beanContext = createBeanContextAndSetBeanInContext(BEAN_ID, myBean);
 
         smooksExecutionContext = createExecutionContext();
-        setExchangeAsAttributeInExecutionContext(exchange);
         makeExecutionContextReturnBeanContext(beanContext);
     }
 
@@ -165,10 +165,6 @@ public class BeanRouterTest extends CamelTestSupport {
 
     private ExecutionContext createExecutionContext() {
         return mock(ExecutionContext.class);
-    }
-
-    private void setExchangeAsAttributeInExecutionContext(Exchange exchange) {
-        when(smooksExecutionContext.get(SmooksProcessor.EXCHANGE_TYPED_KEY)).thenReturn(exchange);
     }
 
     private void makeExecutionContextReturnBeanContext(BeanContext beanContext) {
