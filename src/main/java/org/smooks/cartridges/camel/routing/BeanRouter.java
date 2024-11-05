@@ -65,6 +65,7 @@ import org.smooks.support.FreeMarkerUtils;
 import org.w3c.dom.Element;
 
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -183,27 +184,27 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
      * Send the bean to the target endpoint.
      *
      * @param bean        The bean to be sent.
-     * @param execContext The execution context.
+     * @param executionContext The execution context.
      */
-    protected void sendBean(final Object bean, final ExecutionContext execContext) {
+    protected void sendBean(final Object bean, final ExecutionContext executionContext) {
         try {
             if (correlationIdPattern != null && correlationIdPattern.isPresent()) {
                 Processor processor = exchange -> {
                     Message in = exchange.getIn();
                     in.setBody(bean);
-                    in.setHeader(correlationIdName.orElse(null), correlationIdPattern.get().apply(FreeMarkerUtils.getMergedModel(execContext)));
+                    in.setHeader(correlationIdName.orElse(null), correlationIdPattern.get().apply(FreeMarkerUtils.getMergedModel(executionContext)));
                 };
                 producerTemplate.send(toEndpoint, processor);
             } else {
-                producerTemplate.sendBodyAndHeaders(toEndpoint, bean, execContext.getBeanContext().getBeanMap());
+                producerTemplate.sendBodyAndHeaders(toEndpoint, bean, Map.of("CamelSmooksExecutionContext", executionContext));
             }
         } catch (final Exception e) {
-            throw new SmooksException("Exception routing beanId '" + beanId + "' to endpoint '" + toEndpoint + "'.", e);
+            throw new SmooksException(String.format("Exception routing beanId [%s] to endpoint [%s]", beanId, toEndpoint), e);
         }
     }
 
-    private Object getBeanFromExecutionContext(final ExecutionContext execContext, final String beanId) {
-        final Object bean = execContext.getBeanContext().getBean(beanId);
+    protected Object getBeanFromExecutionContext(final ExecutionContext executionContext, final String beanId) {
+        final Object bean = executionContext.getBeanContext().getBean(beanId);
         if (bean == null) {
             throw new SmooksException("Exception routing beanId '" + beanId
                     + "'. The bean was not found in the Smooks ExceutionContext.");
@@ -212,7 +213,7 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
         return bean;
     }
 
-    private CamelContext getCamelContext() {
+    protected CamelContext getCamelContext() {
         if (camelContext == null) {
             return applicationContext.getRegistry().lookup(CamelContext.class);
         } else {
@@ -220,7 +221,7 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
         }
     }
 
-    private boolean isBeanRoutingConfigured() {
+    protected boolean isBeanRoutingConfigured() {
         return "none".equals(resourceConfig.getSelectorPath().getSelector());
     }
 
