@@ -98,7 +98,7 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
     protected ResourceConfig resourceConfig;
 
     protected ProducerTemplate producerTemplate;
-    protected BeanRouterObserver camelRouterObserable;
+    protected BeanRouterObserver camelRouterObservable;
     protected CamelContext camelContext;
 
     public BeanRouter() {
@@ -116,9 +116,9 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
 
         producerTemplate = getCamelContext().createProducerTemplate();
         if (isBeanRoutingConfigured()) {
-            camelRouterObserable = new BeanRouterObserver(this, beanId);
+            camelRouterObservable = new BeanRouterObserver(this, beanId);
             if (condition != null && condition.isPresent()) {
-                camelRouterObserable.setConditionEvaluator(new BeanMapExpressionEvaluator(condition.get()));
+                camelRouterObservable.setConditionEvaluator(new BeanMapExpressionEvaluator(condition.get()));
             }
         }
 
@@ -206,8 +206,7 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
     protected Object getBeanFromExecutionContext(final ExecutionContext executionContext, final String beanId) {
         final Object bean = executionContext.getBeanContext().getBean(beanId);
         if (bean == null) {
-            throw new SmooksException("Exception routing beanId '" + beanId
-                    + "'. The bean was not found in the Smooks ExceutionContext.");
+            throw new SmooksException(String.format("Exception routing beanId [%s]. The bean was not found in the Smooks execution context", beanId));
         }
 
         return bean;
@@ -242,14 +241,14 @@ public class BeanRouter implements AfterVisitor, Consumer, PreExecutionLifecycle
     @Override
     public void onPostExecution(ExecutionContext executionContext) {
         if (isBeanRoutingConfigured()) {
-            executionContext.getBeanContext().removeObserver(camelRouterObserable);
+            executionContext.getBeanContext().removeObserver(camelRouterObservable);
         }
     }
 
     @Override
     public void onPreExecution(ExecutionContext executionContext) {
         if (isBeanRoutingConfigured()) {
-            executionContext.getBeanContext().addObserver(camelRouterObserable);
+            executionContext.getBeanContext().addObserver(camelRouterObservable);
         }
     }
 }
