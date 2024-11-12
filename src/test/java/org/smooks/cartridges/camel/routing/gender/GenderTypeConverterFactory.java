@@ -40,37 +40,21 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.camel.converters;
+package org.smooks.cartridges.camel.routing.gender;
 
-import org.apache.camel.Converter;
-import org.smooks.cartridges.camel.Coordinate;
-import org.smooks.io.sink.JavaSink;
+import org.smooks.api.converter.TypeConverter;
+import org.smooks.api.converter.TypeConverterDescriptor;
+import org.smooks.api.converter.TypeConverterFactory;
+import org.smooks.engine.converter.DefaultTypeConverterDescriptor;
 
-import java.util.Map;
-
-/**
- * Converts a JavaResult to a Coordinate object.
- * <p/>
- * This converter is only intended for testing purposes.
- *
- * @author Daniel Bevenius
- */
-@Converter(generateLoader = true)
-public class CoordinateConverter {
-    private CoordinateConverter() {
+public class GenderTypeConverterFactory implements TypeConverterFactory<String, Gender> {
+    @Override
+    public TypeConverter<String, Gender> createTypeConverter() {
+        return value -> Enum.valueOf(Gender.class, value);
     }
 
-    @Converter
-    public static Coordinate toCoordinate(JavaSink sink) {
-        Object singleObject = getSingleObjectFromJavaResult(sink);
-        return (Coordinate) singleObject;
-    }
-
-    private static Object getSingleObjectFromJavaResult(JavaSink sink) {
-        Map<String, Object> resultMap = sink.getResultMap();
-        if (resultMap.size() == 1) {
-            return resultMap.values().iterator().next();
-        }
-        return null;
+    @Override
+    public TypeConverterDescriptor<Class<String>, Class<Gender>> getTypeConverterDescriptor() {
+        return new DefaultTypeConverterDescriptor<>(String.class, Gender.class);
     }
 }
