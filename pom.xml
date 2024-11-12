@@ -7,7 +7,7 @@
 
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-camel-cartridge</artifactId>
-    <version>3.0.0</version>
+    <version>4.0.0-SNAPSHOT</version>
 
     <name>Smooks Camel Cartridge</name>
     <url>https://www.smooks.org</url>
