@@ -40,41 +40,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * =========================LICENSE_END==================================
  */
-package org.smooks.cartridges.camel.converters;
+package org.smooks.cartridges.camel.routing.gender;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.TypeConverter;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.smooks.io.source.JavaSourceWithoutEventStream;
-
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-/**
- * Unit test for {@link SourceConverter}. </p>
- *
- * @author Daniel Bevenius
- */
-public class SourceConverterTest {
-    private TypeConverter typeConverter;
-
-    @BeforeEach
-    public void beforeEach() {
-        CamelContext camelContext = new DefaultCamelContext();
-        typeConverter = camelContext.getTypeConverter();
-    }
-
-    @Test
-    public void convertStringToJavaSourceWithoutEventStream() {
-        final String payload = "dummyPayload";
-        final JavaSourceWithoutEventStream javaSource = typeConverter.convertTo(JavaSourceWithoutEventStream.class, payload);
-        final Map<String, Object> beans = javaSource.getBeans();
-        final String actualPayload = (String) beans.get("string");
-
-        assertThat(payload, is(actualPayload));
-    }
+public enum Gender {
+    Male,
+    Female
 }

@@ -46,7 +46,7 @@ Using Smooks in Camel can be done in three ways:
 
 === SmooksComponent
 
-WARNING: SmooksComponent is deprecated and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
+WARNING: SmooksComponent is removed in v4 of the cartridge and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
 
 The `+SmooksComponent+` is a Camel https://camel.apache.org/component.html[Component] which can used when  you want to process the Camel Message Body using Smooks. You can do this by adding a route in your Camel route configuration:
 
@@ -69,7 +69,7 @@ An Apache Component can take options that are specified after the Smooks configu
 
 === SmooksDataFormat
 
-WARNING: SmooksDataFormat is deprecated and superseded by the https://camel.apache.org/components/next/dataformats/smooks-dataformat.html[Camel Smooks Data Format].
+WARNING: SmooksDataFormat is removed in v4 of the cartridge and superseded by the https://camel.apache.org/components/next/dataformats/smooks-dataformat.html[Camel Smooks Data Format].
 
 `+SmooksDataFormat+` is a Camel DataFormat which is capable of transforming from one data format to another and back again. You would use this when you are only interested in transforming from one format to another and not interested in other Smooks features.
 
@@ -86,7 +86,7 @@ from("direct:unmarshal")
 
 === SmooksProcessor
 
-WARNING: SmooksProcessor is deprecated and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
+WARNING: SmooksProcessor is removed in v4 of the cartridge and superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component].
 
 Using `+SmooksProcessor+` gives you full control over Smooks, for example if you want to programmatically create the underlying Smooks instance you’d use `+SmooksProcessor+`. When using `+SmooksProcessor+`, you can pass a Smooks instance to its constructor and prior to that programmatically configure Smooks.
 
@@ -118,7 +118,7 @@ from("file://input?noop=true")
 .to("mock:result");
 ----
 
-TIP: See the https://github.com/smooks/smooks-examples/tree/v2/camel[Apache Camel examples] in the examples page.
+TIP: See the https://github.com/smooks/smooks-examples/tree/v4/camel[Apache Camel examples] in the examples page.
 
 == Maven Coordinates
 
@@ -128,7 +128,7 @@ TIP: See the https://github.com/smooks/smooks-examples/tree/v2/camel[Apache Came
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-camel-cartridge</artifactId>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
 </dependency>
 ----
 // end::smooks-camel-cartridge[]
