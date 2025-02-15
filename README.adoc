@@ -10,7 +10,7 @@ image:https://github.com/smooks/smooks-camel-cartridge/workflows/CI/badge.svg[Bu
 * Apache Camel 4.x
 
 // tag::smooks-camel-cartridge[]
-CAUTION: The Camel cartridge is deprecated. It is superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component] or the https://camel.apache.org/components/next/dataformats/smooks-dataformat.html[Camel Smooks Data Format].
+CAUTION: The Camel cartridge is deprecated. It is superseded by the https://camel.apache.org/components/next/smooks-component.html[Camel Smooks Component] and the https://camel.apache.org/components/next/dataformats/smooks-dataformat.html[Camel Smooks Data Format].
 
 It is possible to route fragments to Apache Camel endpoints using the `+<camel:route>+` configuration from the `+https://www.smooks.org/xsd/smooks/camel-1.5.xsd+` configuration namespace.
 
